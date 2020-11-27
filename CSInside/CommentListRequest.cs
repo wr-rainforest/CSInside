@@ -15,12 +15,12 @@ namespace CSInside
     {
         private string galleryId;
 
-        private int articleNo;
+        private int postNo;
 
         public CommentListRequest(string galleryId, int articleNo, HttpClient client, IAuthTokenProvider authTokenProvider) : base(client, authTokenProvider)
         {
             this.galleryId = galleryId;
-            this.articleNo = articleNo;
+            this.postNo = articleNo;
         }
 
         public override async Task<Comment[]> Execute()
@@ -29,7 +29,7 @@ namespace CSInside
             List<Comment> comments = new List<Comment>();
             for (int i = 1, totalPage = 1; i <= totalPage; i++)
             {
-                string hash = $"http://app.dcinside.com/api/comment_new.php?id={galleryId}&no={articleNo}&re_page={i}&app_id={appid}".ToBase64String(Encoding.ASCII);
+                string hash = $"http://app.dcinside.com/api/comment_new.php?id={galleryId}&no={postNo}&re_page={i}&app_id={appid}".ToBase64String(Encoding.ASCII);
                 string uri = Uri.EscapeUriString($"http://app.dcinside.com/api/redirect.php?hash={hash}");
                 var request = new HttpRequestMessage(HttpMethod.Get, uri);
                 var response = await Client.SendAsync(request);
@@ -43,7 +43,7 @@ namespace CSInside
                 totalPage = (int)jObject["total_page"];
                 comments.AddRange(jObject["comment_list"].ToObject<Comment[]>());
             }
-            comments.ForEach(item => { item.GalleryId = galleryId; item.ArticleNo = articleNo; });
+            comments.ForEach(item => { item.GalleryId = galleryId; item.PostNo = postNo; });
             return comments.Distinct().ToArray();
         }
 
@@ -51,7 +51,7 @@ namespace CSInside
         {
             throw new NotImplementedException();
             string appid = AuthTokenProvider.GetAppId();
-            string hash = $"http://app.dcinside.com/api/comment_new.php?id={galleryId}&no={articleNo}&re_page={pageNo}&app_id={appid}".ToBase64String(Encoding.ASCII);
+            string hash = $"http://app.dcinside.com/api/comment_new.php?id={galleryId}&no={postNo}&re_page={pageNo}&app_id={appid}".ToBase64String(Encoding.ASCII);
             string uri = Uri.EscapeUriString($"http://app.dcinside.com/api/redirect.php?hash={hash}");
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
             var response = await Client.SendAsync(request);
@@ -76,7 +76,7 @@ namespace CSInside
                 return new Comment[0];
             }
             var comments = jObject["comment_list"].ToObject<List<Comment>>();
-            comments.ForEach(item => { item.GalleryId = galleryId; item.ArticleNo = articleNo; });
+            comments.ForEach(item => { item.GalleryId = galleryId; item.PostNo = postNo; });
             return comments.ToArray();
         }
     }

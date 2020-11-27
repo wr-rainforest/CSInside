@@ -6,15 +6,15 @@ using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
-    public class Article
+    public class Post
     {
         [JsonProperty("gallery_id")]
         public string GalleryId { get; set; }
 
         [JsonProperty("no")]
-        private string No { set => ArticleNo = int.Parse(value); }
-        [JsonProperty("article_no")]
-        public int ArticleNo { get; set; }
+        private string No { set => PostNo = int.Parse(value); }
+        [JsonProperty("post_no")]
+        public int PostNo { get; set; }
 
         [JsonProperty("subject")]
         private string subject { set => Title = value; }

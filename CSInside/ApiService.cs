@@ -40,14 +40,14 @@ namespace CSInside
             this.authTokenProvider = authTokenProvider;
         }
 
-        public ArticleRequest CreateArticleRequest(string galleryId, int articleNo)
+        public PostRequest CreatePostRequest(string galleryId, int postNo)
         {
-            return new ArticleRequest(galleryId, articleNo, client, authTokenProvider);
+            return new PostRequest(galleryId, postNo, client, authTokenProvider);
         }
 
-        public CommentListRequest CreateCommentListRequest(string galleryId, int articleNo)
+        public CommentListRequest CreateCommentListRequest(string galleryId, int postNo)
         {
-            return new CommentListRequest(galleryId, articleNo, client, authTokenProvider);
+            return new CommentListRequest(galleryId, postNo, client, authTokenProvider);
         }
 
         public ImageRequest CreateImageRequest(string imageUri)

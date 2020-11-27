@@ -13,14 +13,14 @@ namespace ConsoleApp
             IAuthTokenProvider authTokenProvider = new AuthTokenProvider();
             ApiService service = new ApiService(authTokenProvider);
 
-            ArticleRequest articleRequest = service.CreateArticleRequest("programming", 1539207);
-            Article article = await articleRequest.Execute();
-            Console.WriteLine(JsonConvert.SerializeObject(article, Formatting.Indented));
+            PostRequest postRequest = service.CreatePostRequest("programming", 1539207);
+            Post post = await postRequest.Execute();
+            Console.WriteLine(JsonConvert.SerializeObject(post, Formatting.Indented));
 
             CommentListRequest commentListRequest = service.CreateCommentListRequest("programming", 1539207);
             Comment[] comments = await commentListRequest.Execute();
             Console.WriteLine(JsonConvert.SerializeObject(comments, Formatting.Indented));
-
+             
             ImageRequest imageRequest = service.CreateImageRequest("https://dcimg6.dcinside.com/viewimage.php?&no=24b0d......3ca1e");
             byte[] previewImage = await imageRequest.Execute(ImageType.Preview);
             byte[] webImage = await imageRequest.Execute(ImageType.Web);

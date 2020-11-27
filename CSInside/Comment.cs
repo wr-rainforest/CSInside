@@ -11,8 +11,8 @@ namespace CSInside
         [JsonProperty("gallery_id")]
         public string GalleryId { get; set; }
 
-        [JsonProperty("article_no")]
-        public int ArticleNo { get; set; }
+        [JsonProperty("post_no")]
+        public int PostNo { get; set; }
 
         [JsonProperty("comment_no")]
         public int CommentNo { get; set; }
