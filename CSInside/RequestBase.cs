@@ -9,22 +9,41 @@ namespace CSInside
         /// <summary>
         /// 
         /// </summary>
-        protected HttpClient Client { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected IAuthTokenProvider AuthTokenProvider { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="authTokenProvider"></param>
-        internal RequestBase(HttpClient client, IAuthTokenProvider authTokenProvider)
+        protected HttpClient Client
         {
-            Client = client;
-            AuthTokenProvider = authTokenProvider;
+            get
+            {
+                //if (Service == null)
+                //    throw new NullReferenceException();
+                return Service.Client;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected IAuthTokenProvider AuthTokenProvider
+        {
+            get
+            {
+                //if (Service == null)
+                //    throw new NullReferenceException();
+                return Service.AuthTokenProvider;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ApiService Service { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="service"></param>
+        internal RequestBase(ApiService service)
+        {
+            Service = service;
         }
 
         /// <summary>
@@ -39,22 +58,41 @@ namespace CSInside
         /// <summary>
         /// 
         /// </summary>
-        protected HttpClient Client { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected IAuthTokenProvider AuthTokenProvider { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="authTokenProvider"></param>
-        internal RequestBase(HttpClient client, IAuthTokenProvider authTokenProvider)
+        protected HttpClient Client
         {
-            Client = client;
-            AuthTokenProvider = authTokenProvider;
+            get
+            {
+                //if (Service == null)
+                //    throw new NullReferenceException();
+                return Service.Client;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected IAuthTokenProvider AuthTokenProvider
+        {
+            get
+            {
+                //if (Service == null)
+                //    throw new NullReferenceException();
+                return Service.AuthTokenProvider;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public ApiService Service { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="service"></param>
+        internal RequestBase(ApiService service)
+        {
+            Service = service;
         }
 
         /// <summary>
@@ -62,35 +100,5 @@ namespace CSInside
         /// </summary>
         /// <returns></returns>
         public abstract Task<TResult> Execute(T arg);
-    }
-
-    public abstract class RequestBase<T1, T2, TResult>
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        protected HttpClient Client { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected IAuthTokenProvider AuthTokenProvider { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="client"></param>
-        /// <param name="authTokenProvider"></param>
-        internal RequestBase(HttpClient client, IAuthTokenProvider authTokenProvider)
-        {
-            Client = client;
-            AuthTokenProvider = authTokenProvider;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public abstract Task<TResult> Execute(T1 arg1, T2 arg2);
     }
 }

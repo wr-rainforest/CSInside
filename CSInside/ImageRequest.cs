@@ -8,7 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
-using CSInside.Extensions;
+
 namespace CSInside
 {
     public class ImageRequest : RequestBase<ImageType, byte[]>
@@ -32,7 +32,7 @@ namespace CSInside
         /// <param name="client"></param>
         /// <param name="authTokenProvider"></param>
         /// <exception cref="ArgumentException"></exception>
-        internal ImageRequest(string imageUri, HttpClient client, IAuthTokenProvider authTokenProvider) : base(client, authTokenProvider)
+        internal ImageRequest(string imageUri, ApiService service) : base(service)
         {
             if(!Uri.TryCreate(imageUri, UriKind.Absolute, out Uri uri))
             {

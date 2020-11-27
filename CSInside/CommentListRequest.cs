@@ -17,7 +17,7 @@ namespace CSInside
 
         private int postNo;
 
-        public CommentListRequest(string galleryId, int postNo, HttpClient client, IAuthTokenProvider authTokenProvider) : base(client, authTokenProvider)
+        public CommentListRequest(string galleryId, int postNo, ApiService service) : base(service)
         {
             this.galleryId = galleryId;
             this.postNo = postNo;

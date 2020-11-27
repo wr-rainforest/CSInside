@@ -15,7 +15,7 @@ namespace CSInside
 
         private int postNo;
 
-        internal PostRequest(string galleryId, int postNo, HttpClient client, IAuthTokenProvider authTokenProvider) : base(client, authTokenProvider)
+        internal PostRequest(string galleryId, int postNo, ApiService service) : base(service)
         {
             this.galleryId = galleryId;
             this.postNo = postNo;
