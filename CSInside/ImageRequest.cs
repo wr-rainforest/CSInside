@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -15,45 +15,54 @@ namespace CSInside
     {
         private readonly static MD5 md5 = MD5.Create();
 
-        private readonly string baseUri = "http://image.dcinside.com";
+        private readonly static Regex regex = new Regex(@"^[A-Fa-f0-9]*$");
 
-        private string originUri;
+        private readonly static string baseUri = "http://image.dcinside.com";
 
-        private string directory;
+        private readonly string initUri;
 
-        private string fileName;
+        private readonly string directory;
 
-        private string extension;
+        private readonly string fileName;
+#nullable enable
+        private readonly string? prefix;
+#nullable restore
+        private readonly string extension;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="imageUri"></param>
-        /// <param name="client"></param>
-        /// <param name="authTokenProvider"></param>
+        /// <param name="service"></param>
         /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         internal ImageRequest(string imageUri, ApiService service) : base(service)
         {
-            if(!Uri.TryCreate(imageUri, UriKind.Absolute, out Uri uri))
-            {
-                throw new ArgumentException("Uri 파싱에 실패하였습니다.");
-            }
+            //매개변수 검사
+            if (imageUri is null)
+                throw new ArgumentNullException(nameof(imageUri));
+            if (!Uri.TryCreate(imageUri, UriKind.Absolute, out Uri uri))
+                throw new ArgumentException("imageUri 파싱에 실패하였습니다.", nameof(imageUri));
             string param = HttpUtility.ParseQueryString(uri.Query).Get("no");
-            if(string.IsNullOrEmpty(param))
-            {
-                throw new ArgumentException("Uri 분석에 실패하였습니다. ('no' 매개변수가 Uri에 존재하지 않습니다.)");
-            }
+            if (string.IsNullOrEmpty(param))
+                throw new ArgumentException("'no' 매개변수가 imageUri에 존재하지 않습니다.", nameof(imageUri));
+            if (!regex.IsMatch(param))
+                throw new ArgumentException("imageUri의 'no' 매개변수는 Hex String이어야 합니다.", nameof(imageUri));
+
+            //필드 초기화
             string plainText = DecryptQueryString(param);
             fileName = Path.GetFileName(plainText);
             directory = plainText.Replace("/" + fileName, string.Empty);
             extension = Path.GetExtension(plainText);
-            if (fileName.Contains("web_"))
+            if (fileName.StartsWith("web_"))
             {
-                fileName = fileName.Replace("web_", "");
+                prefix = "web_";
+                fileName = fileName.Replace("web_", string.Empty);
             }
-            else if (fileName.Contains("web2_"))
+            else if (fileName.StartsWith("web2_"))
             {
-                fileName = fileName.Replace("web2_", "");
+                prefix = "web2_";
+                fileName = fileName.Replace("web2_", string.Empty);
             }
             else if (extension.Contains("_s"))
             {
@@ -65,56 +74,78 @@ namespace CSInside
                 extension = extension.Replace("_s2", string.Empty);
                 fileName = Path.ChangeExtension(fileName, extension);
             }
-            originUri = imageUri;
+            initUri = imageUri;
         }
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        /// <exception cref="ApiRequestException"></exception>
-        public override async Task<byte[]> Execute(ImageType imageType = ImageType.Origin)
+        /// <exception cref="CSInsideException"></exception>
+#nullable enable
+        public override async Task<byte[]?> ExecuteAsync(ImageType imageType = ImageType.Origin)
+#nullable restore
         {
-            string imageUri;
-            switch (imageType)
+            //imageUri 조합
+#pragma warning disable CS8509 // switch 식에서 입력 형식의 가능한 값을 모두 처리하지는 않습니다(전체 아님).
+            string imageUri = imageType switch
+#pragma warning restore CS8509 // switch 식에서 입력 형식의 가능한 값을 모두 처리하지는 않습니다(전체 아님).
             {
-                case ImageType.Origin:
-                    imageUri = $"{baseUri}/{directory}/{fileName}";
-                    break;
-                case ImageType.S:
-                    imageUri = $"{baseUri}/{directory}/{fileName}_s";
-                    break;
-                case ImageType.Preview:
-                    imageUri = $"{baseUri}/{directory}/{fileName}_s2";
-                    break;
-                case ImageType.Web:
-                    imageUri = $"{baseUri}/{directory}/web2_{fileName}";
-                    break;
-                default:
-                    throw new Exception();
-            }
-            var request = new HttpRequestMessage(HttpMethod.Get, imageUri);
-            var response =await Client.SendAsync(request);
-            if(response.StatusCode == HttpStatusCode.NotFound && imageType == ImageType.Web)
-            {
-                imageUri = $"{baseUri}/{directory}/web_{fileName}";
-                request = new HttpRequestMessage(HttpMethod.Get, imageUri);
-                request.Headers.Add("Referer", "https://dcinside.com");
-                response = await Client.SendAsync(request);
-            }
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                throw new ApiRequestException(404, $"서버에서 이미지를 찾을 수 없습니다. ({imageUri})");
-            }
+                ImageType.Origin => $"{baseUri}/{directory}/{fileName}",
+                ImageType.S => $"{baseUri}/{directory}/{fileName}_s",
+                ImageType.Preview => $"{baseUri}/{directory}/{fileName}_s2",
+                ImageType.Web => $"{baseUri}/{directory}/{(string.IsNullOrEmpty(prefix) ? "web2_" : prefix)}{fileName}",
+            };
+
+            //HTTP 요청
+            byte[] image = null;
+            //- imageType == ImageType.Web && prefix == null
+            //  - 1st. $"{baseUri}/{directory}/web2_{fileName}
+            //  - 2nd. $"{baseUri}/{directory}/web_{fileName}
+            //  - 3rd. $"{baseUri}/{directory}/{fileName}
+            //  - 4th  return null
+
+            //- imageType == ImageType.Web && prefix == web_
+            //  - 1st. $"{baseUri}/{directory}/web_{fileName}
+            //  - 2nd. 
+            //  - 3rd.
+            //  - 4th.  return null
+
+            //- imageType == ImageType.Web && prefix == web2_
+            //  - 1st. $"{baseUri}/{directory}/web2_{fileName}
+            //  - 2nd.
+            //  - 3rd.
+            //  - 4th  return null
             try
             {
-                response.EnsureSuccessStatusCode();
+                //1st
+                var response = await Client.GetAsync(imageUri);
+                //2nd
+                if (response.StatusCode == HttpStatusCode.NotFound && imageType == ImageType.Web && string.IsNullOrEmpty(prefix))
+                {
+                    imageUri = $"{baseUri}/{directory}/web_{fileName}";
+                    response = await Client.GetAsync(imageUri);
+                }
+                //3rd
+                if (response.StatusCode == HttpStatusCode.NotFound && imageType == ImageType.Web && string.IsNullOrEmpty(prefix))
+                {
+                    imageUri = $"{baseUri}/{directory}/{fileName}";
+                    response = await Client.GetAsync(imageUri);
+                }
+                //4th
+                if (response.StatusCode != HttpStatusCode.NotFound)
+                {
+                    //404에는 null값 반환, 다른 상태코드는 throw
+                    response.EnsureSuccessStatusCode();
+                }
             }
             catch (Exception e)
             {
-                throw new ApiRequestException((int)response.StatusCode, "알 수 없는 오류", e);
+                if (e.GetType() == typeof(CSInsideException))
+                    throw;
+                throw new CSInsideException($"예기치 않은 예외가 발생하였습니다.", e);
             }
-            return await response.Content.ReadAsByteArrayAsync();
-            
+            return image;
         }
 
         public string GetImageExtension()

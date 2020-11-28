@@ -50,7 +50,7 @@ namespace CSInside
         /// 
         /// </summary>
         /// <returns></returns>
-        public abstract Task<TResult> Execute();
+        public abstract Task<TResult> ExecuteAsync();
     }
 
     public abstract class RequestBase<T, TResult>
@@ -99,6 +99,6 @@ namespace CSInside
         /// 
         /// </summary>
         /// <returns></returns>
-        public abstract Task<TResult> Execute(T arg);
+        public abstract Task<TResult> ExecuteAsync(T arg);
     }
 }

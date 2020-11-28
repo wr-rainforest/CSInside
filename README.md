@@ -14,15 +14,15 @@ namespace ConsoleApp
             ApiService service = new ApiService(authTokenProvider);
 
             PostRequest postRequest = service.CreatePostRequest("programming", 1476608);
-            Post post = await postRequest.Execute();
+            Post post = await postRequest.ExecuteAsync();
 
             CommentListRequest commentListRequest = service.CreateCommentListRequest("programming", 1476608);
-            Comment[] comments = await commentListRequest.Execute();
+            Comment[] comments = await commentListRequest.ExecuteAsync();
              
             ImageRequest imageRequest = service.CreateImageRequest("https://dcimg6.dcinside.com/....3ca1e");
-            byte[] previewImage = await imageRequest.Execute(ImageType.Preview);
-            byte[] webImage = await imageRequest.Execute(ImageType.Web);
-            byte[] originalImage = await imageRequest.Execute(ImageType.Origin);
+            byte[] previewImage = await imageRequest.ExecuteAsync(ImageType.Preview);
+            byte[] webImage = await imageRequest.ExecuteAsync(ImageType.Web);
+            byte[] originalImage = await imageRequest.ExecuteAsync(ImageType.Origin);
         }
     }
 }

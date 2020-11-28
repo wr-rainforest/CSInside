@@ -40,16 +40,20 @@ namespace CSInside
             AuthTokenProvider = authTokenProvider;
         }
 
+        /// <exception cref="ArgumentNullException"></exception>
         public PostRequest CreatePostRequest(string galleryId, int postNo)
         {
             return new PostRequest(galleryId, postNo, this);
         }
 
+        /// <exception cref="ArgumentNullException"></exception>
         public CommentListRequest CreateCommentListRequest(string galleryId, int postNo)
         {
             return new CommentListRequest(galleryId, postNo, this);
         }
 
+        /// <exception cref="ArgumentException"></exception>
+        /// <exception cref="ArgumentNullException"></exception>
         public ImageRequest CreateImageRequest(string imageUri)
         {
             return new ImageRequest(imageUri, this);
