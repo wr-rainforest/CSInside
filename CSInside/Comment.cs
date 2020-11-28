@@ -38,17 +38,24 @@ namespace CSInside
         public string Body { get; set; }
 
         [JsonProperty("date_time")]
-        public string DateTime { get; set; }
+        private string DateTime { set => TimeStamp = System.DateTime.ParseExact(value, "yyyy.MM.dd HH:mm", null); }
+        [JsonProperty("timestamp")]
+        public DateTime TimeStamp { get; set; }
 
         [JsonProperty("under_step")]
-        public bool UnderStep { get; set; }
+        private bool UnderStep { set => IsReply = value; }
+        [JsonProperty("is_reply")]
+        public bool IsReply { get; set; }
 
         [JsonProperty("dccon")]
-        public string Dccon { get; set; }
+        private string DCCon { set => DCConUri = value; }
+        [JsonProperty("dccon_uri")]
+        public string DCConUri { get; set; }
 
         [JsonProperty("dccon_detail_idx")]
-        public int? DcconDetailIdx { get; set; }
-
+        private int? DCConDetailIdx { set => DCConDetailIndex = value; }
+        [JsonProperty("dccon_detail_index")]
+        public int? DCConDetailIndex { get; set; }
 
         [JsonProperty("member_icon")]
         public string MemberIcon { get; set; }

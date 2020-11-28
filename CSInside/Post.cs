@@ -64,7 +64,9 @@ namespace CSInside
         public bool IsNotice { get; set; }
 
         [JsonProperty("date_time")]
-        public string DateTime { get; set; }
+        private string DateTime { set => TimeStamp = System.DateTime.ParseExact(value, "yyyy.MM.dd HH:mm", null); }
+        [JsonProperty("timestamp")]
+        public DateTime TimeStamp { get; set; }
 
         [JsonProperty("write_type")]
         public string WriteType { get; set; }
