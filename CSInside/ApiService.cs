@@ -59,6 +59,18 @@ namespace CSInside
             return new ImageRequest(imageUri, this);
         }
 
+        /// <exception cref="ArgumentNullException"></exception>
+        public UpvoteRequest CreateUpvoteRequest(string galleryId, int postNo)
+        {
+            return new UpvoteRequest(galleryId, postNo, this);
+        }
+
+        /// <exception cref="ArgumentNullException"></exception>
+        public DownvoteRequest CreateDownvoteRequest(string galleryId, int postNo)
+        {
+            return new DownvoteRequest(galleryId, postNo, this);
+        }
+
         public void Dispose()
         {
             Client.Dispose();

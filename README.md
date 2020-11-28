@@ -19,10 +19,16 @@ namespace ConsoleApp
             CommentListRequest commentListRequest = service.CreateCommentListRequest("programming", 1476608);
             Comment[] comments = await commentListRequest.ExecuteAsync();
              
-            ImageRequest imageRequest = service.CreateImageRequest("https://dcimg6.dcinside.com/....3ca1e");
+            ImageRequest imageRequest = service.CreateImageRequest("https://dcimg8.dcinside.co.kr/...");
             byte[] previewImage = await imageRequest.ExecuteAsync(ImageType.Preview);
             byte[] webImage = await imageRequest.ExecuteAsync(ImageType.Web);
             byte[] originalImage = await imageRequest.ExecuteAsync(ImageType.Origin);
+
+            UpvoteRequest upvoteRequest = service.CreateUpvoteRequest("programming", 1476608);
+            bool upvoteResult = await upvoteRequest.ExecuteAsync();
+
+            DownvoteRequest downvoteRequest = service.CreateDownvoteRequest("programming", 1476608);
+            bool downvoteResult = await downvoteRequest.ExecuteAsync();
         }
     }
 }
