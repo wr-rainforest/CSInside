@@ -16,6 +16,9 @@ namespace ConsoleApp
             PostRequest postRequest = service.CreatePostRequest("programming", 1476608);
             Post post = await postRequest.ExecuteAsync();
 
+            PostDeleteRequest postDeleteRequest = service.CreatePostDeleteRequest("programming", 1476608);
+            await postDeleteRequest.ExecuteAsync();
+
             CommentListRequest commentListRequest = service.CreateCommentListRequest("programming", 1476608);
             Comment[] comments = await commentListRequest.ExecuteAsync();
              
