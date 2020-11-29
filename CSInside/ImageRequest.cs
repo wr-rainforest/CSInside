@@ -98,7 +98,7 @@ namespace CSInside
             };
 
             //HTTP 요청
-            byte[] image = null;
+            byte[] image;
             //- imageType == ImageType.Web && prefix == null
             //  - 1st. $"{baseUri}/{directory}/web2_{fileName}
             //  - 2nd. $"{baseUri}/{directory}/web_{fileName}
@@ -133,10 +133,15 @@ namespace CSInside
                     response = await Client.GetAsync(imageUri);
                 }
                 //4th
-                if (response.StatusCode != HttpStatusCode.NotFound)
+                if (response.StatusCode == HttpStatusCode.NotFound)
                 {
                     //404에는 null값 반환, 다른 상태코드는 throw
+                    image = null;
+                }
+                else
+                {
                     response.EnsureSuccessStatusCode();
+                    image = await response.Content.ReadAsByteArrayAsync();
                 }
             }
             catch (Exception e)
@@ -146,6 +151,11 @@ namespace CSInside
                 throw new CSInsideException($"예기치 않은 예외가 발생하였습니다.", e);
             }
             return image;
+        }
+
+        public string GetImageFileName()
+        {
+            return fileName;
         }
 
         public string GetImageExtension()
