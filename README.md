@@ -11,13 +11,17 @@ namespace ConsoleApp
         static async Task Main(string[] args)
         {
             AuthTokenProvider authTokenProvider = new AuthTokenProvider();
-            await authTokenProvider.LoginAsync("user_id", "password");
+            //await authTokenProvider.LoginAsync("user_id", "password");
 
             ApiService service = new ApiService(authTokenProvider);
-            
+            //ApiService service = new ApiService(authTokenProvider, new WebProxy("127.0.0.1", 9150));
+
             PostRequest postRequest = service.CreatePostRequest("programming", 1476608);
             Post post = await postRequest.ExecuteAsync();
             
+            PostDeleteRequest postDeleteRequest = service.CreatePostDeleteRequest("programming", 1476608);
+            await postDeleteRequest.ExecuteAsync();
+
             CommentListRequest commentListRequest = service.CreateCommentListRequest("programming", 1476608);
             Comment[] comments = await commentListRequest.ExecuteAsync();
 

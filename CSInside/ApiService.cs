@@ -71,6 +71,12 @@ namespace CSInside
             return new DownvoteRequest(galleryId, postNo, this);
         }
 
+        /// <exception cref="ArgumentNullException"></exception>
+        public PostDeleteRequest CreatePostDeleteRequest(string galleryId, int postNo)
+        {
+            return new PostDeleteRequest(galleryId, postNo, this);
+        }
+
         public void Dispose()
         {
             Client.Dispose();
