@@ -39,8 +39,7 @@ namespace CSInside
         public override async Task<bool> ExecuteAsync()
         {
             //HTTP 요청
-            string appId = AuthTokenProvider.GetAppId();
-            //string confirm_id = AuthTokenProvider.GetConfirmId();
+            string app_id = AuthTokenProvider.GetAccessToken();
             string uri = "http://app.dcinside.com/api/_recommend_down.php";
             string jsonString;
             try
@@ -49,8 +48,7 @@ namespace CSInside
                 var keyValuePairs = new Dictionary<string, string>();
                 keyValuePairs.Add("id", galleryId);
                 keyValuePairs.Add("no", postNo.ToString());
-                keyValuePairs.Add("app_id", appId);
-                //keyValuePairs.Add("confirm_id", confirm_id);
+                keyValuePairs.Add("app_id", app_id);
                 request.Content = new FormUrlEncodedContent(keyValuePairs);
                 var response = await Client.SendAsync(request);
                 if (response.StatusCode == HttpStatusCode.InternalServerError)

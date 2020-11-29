@@ -10,15 +10,17 @@ namespace ConsoleApp
     {
         static async Task Main(string[] args)
         {
-            IAuthTokenProvider authTokenProvider = new AuthTokenProvider();
-            ApiService service = new ApiService(authTokenProvider);
+            AuthTokenProvider authTokenProvider = new AuthTokenProvider();
+            await authTokenProvider.LoginAsync("user_id", "password");
 
+            ApiService service = new ApiService(authTokenProvider);
+            
             PostRequest postRequest = service.CreatePostRequest("programming", 1476608);
             Post post = await postRequest.ExecuteAsync();
-
+            
             CommentListRequest commentListRequest = service.CreateCommentListRequest("programming", 1476608);
             Comment[] comments = await commentListRequest.ExecuteAsync();
-             
+
             ImageRequest imageRequest = service.CreateImageRequest("https://dcimg8.dcinside.co.kr/...");
             byte[] previewImage = await imageRequest.ExecuteAsync(ImageType.Preview);
             byte[] webImage = await imageRequest.ExecuteAsync(ImageType.Web);

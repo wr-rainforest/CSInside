@@ -47,8 +47,8 @@ namespace CSInside
             for (int i = 1, totalPage = 1; i <= totalPage; i++)
             {
                 //HTTP 요청
-                string appid = AuthTokenProvider.GetAppId();
-                string hash = $"http://app.dcinside.com/api/comment_new.php?id={galleryId}&no={postNo}&re_page={i}&app_id={appid}".ToBase64String(Encoding.ASCII);
+                string app_id = AuthTokenProvider.GetAccessToken();
+                string hash = $"http://app.dcinside.com/api/comment_new.php?id={galleryId}&no={postNo}&re_page={i}&app_id={app_id}".ToBase64String(Encoding.ASCII);
                 string uri = Uri.EscapeUriString($"http://app.dcinside.com/api/redirect.php?hash={hash}");
                 string jsonString;
                 try

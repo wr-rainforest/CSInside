@@ -6,8 +6,10 @@ namespace CSInside
 {
     public interface IAuthTokenProvider
     {
-        public string GetAppId();
+        public string GetAccessToken();
 
         public string GetClientToken();
+
+        public string GetUserToken();
     }
 }

@@ -45,8 +45,8 @@ namespace CSInside
 #nullable restore
         {
             //HTTP 요청
-            string appid = AuthTokenProvider.GetAppId();
-            string hash = $"http://app.dcinside.com/api/gall_view_new.php?id={galleryId}&no={postNo}&app_id={appid}".ToBase64String(Encoding.ASCII);
+            string app_id = AuthTokenProvider.GetAccessToken();
+            string hash = $"http://app.dcinside.com/api/gall_view_new.php?id={galleryId}&no={postNo}&app_id={app_id}".ToBase64String(Encoding.ASCII);
             string uri = Uri.EscapeUriString($"http://app.dcinside.com/api/redirect.php?hash={hash}");
             string jsonString;
             try

@@ -39,7 +39,7 @@ namespace CSInside
         public override async Task<bool> ExecuteAsync()
         {
             //HTTP 요청
-            string appId = AuthTokenProvider.GetAppId();
+            string appId = AuthTokenProvider.GetAccessToken();
             //string confirm_id = AuthTokenProvider.GetConfirmId();
             string uri = "http://app.dcinside.com/api/_recommend_up.php";
             string jsonString;

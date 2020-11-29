@@ -1,8 +1,5 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CSInside;
-using Newtonsoft.Json;
 
 namespace ConsoleApp
 {
@@ -10,21 +7,28 @@ namespace ConsoleApp
     {
         static async Task Main(string[] args)
         {
-            IAuthTokenProvider authTokenProvider = new AuthTokenProvider();
+            AuthTokenProvider authTokenProvider = new AuthTokenProvider();
+            //await authTokenProvider.LoginAsync("user_id", "password");
+
             ApiService service = new ApiService(authTokenProvider);
+            //ApiService service = new ApiService(authTokenProvider, new WebProxy("http://127.0.0.1", 9150));
 
-            PostRequest postRequest = service.CreatePostRequest("programming", 1539207);
-            Post post = await postRequest.Execute();
-            Console.WriteLine(JsonConvert.SerializeObject(post, Formatting.Indented));
+            PostRequest postRequest = service.CreatePostRequest("programming", 1476608);
+            Post post = await postRequest.ExecuteAsync();
+            
+            CommentListRequest commentListRequest = service.CreateCommentListRequest("programming", 1476608);
+            Comment[] comments = await commentListRequest.ExecuteAsync();
 
-            CommentListRequest commentListRequest = service.CreateCommentListRequest("programming", 1539207);
-            Comment[] comments = await commentListRequest.Execute();
-            Console.WriteLine(JsonConvert.SerializeObject(comments, Formatting.Indented));
-             
-            ImageRequest imageRequest = service.CreateImageRequest("https://dcimg6.dcinside.com/viewimage.php?&no=24b0d......3ca1e");
-            byte[] previewImage = await imageRequest.Execute(ImageType.Preview);
-            byte[] webImage = await imageRequest.Execute(ImageType.Web);
-            byte[] originalImage = await imageRequest.Execute(ImageType.Origin);
+            ImageRequest imageRequest = service.CreateImageRequest("https://dcimg8.dcinside.co.kr/...");
+            byte[] previewImage = await imageRequest.ExecuteAsync(ImageType.Preview);
+            byte[] webImage = await imageRequest.ExecuteAsync(ImageType.Web);
+            byte[] originalImage = await imageRequest.ExecuteAsync(ImageType.Origin);
+
+            UpvoteRequest upvoteRequest = service.CreateUpvoteRequest("programming", 1476608);
+            bool upvoteResult = await upvoteRequest.ExecuteAsync();
+
+            DownvoteRequest downvoteRequest = service.CreateDownvoteRequest("programming", 1476608);
+            bool downvoteResult = await downvoteRequest.ExecuteAsync();
         }
     }
 }
