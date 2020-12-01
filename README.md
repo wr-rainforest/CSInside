@@ -1,5 +1,7 @@
 ## CSInside
 디시인사이드 비공식 API(app, json2)의 C# 래퍼 라이브러리입니다.  
+  
+[API 문서](https://wr-rainforest.github.io/CSInside/)
 ## QuickStart
 ```csharp
 using System.Threading.Tasks;
