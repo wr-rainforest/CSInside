@@ -54,13 +54,6 @@ namespace CSInside
             return new CommentListRequest(galleryId, postNo, this);
         }
 
-        /// <exception cref="ArgumentException"></exception>
-        /// <exception cref="ArgumentNullException"></exception>
-        public ImageRequest CreateImageRequest(string imageUri)
-        {
-            return new ImageRequest(imageUri, this);
-        }
-
         /// <exception cref="ArgumentNullException"></exception>
         public UpvoteRequest CreateUpvoteRequest(string galleryId, int postNo)
         {
