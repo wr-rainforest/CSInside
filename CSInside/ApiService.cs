@@ -23,6 +23,7 @@ namespace CSInside
             Client = new HttpClient(handler);
             Client.DefaultRequestHeaders.Add("User-Agent", "dcinside.app");
             Client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip");
+            Client.DefaultRequestHeaders.Add("Referer", "http://www.dcinside.com");
             AuthTokenProvider = authTokenProvider;
         }
 
@@ -37,6 +38,7 @@ namespace CSInside
             Client = new HttpClient(handler);
             Client.DefaultRequestHeaders.Add("User-Agent", "dcinside.app");
             Client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip");
+            Client.DefaultRequestHeaders.Add("Referer", "http://www.dcinside.com");
             AuthTokenProvider = authTokenProvider;
         }
 
@@ -75,6 +77,12 @@ namespace CSInside
         public PostDeleteRequest CreatePostDeleteRequest(string galleryId, int postNo)
         {
             return new PostDeleteRequest(galleryId, postNo, this);
+        }
+
+        /// <exception cref="ArgumentNullException"></exception>
+        public GallerySearchRequest CreateGallerySearchRequest(string keyword)
+        {
+            return new GallerySearchRequest(keyword, this);
         }
 
         public void Dispose()
