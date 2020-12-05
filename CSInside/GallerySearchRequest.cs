@@ -58,7 +58,7 @@ namespace CSInside
             result.MainGalleries.ToList().ForEach(item => item.IsMinor = false);
             result.MainRecommendGalleries.ToList().ForEach(item => item.IsMinor = false);
             result.MinorGalleries.ToList().ForEach(item => item.IsMinor = true);
-            result.MinorRecommendGalleries.ToList().ForEach(item => item.IsMinor = false);
+            result.MinorRecommendGalleries.ToList().ForEach(item => item.IsMinor = true);
             return result;
         }
     }
