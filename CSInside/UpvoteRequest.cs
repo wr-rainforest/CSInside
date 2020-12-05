@@ -13,20 +13,18 @@ namespace CSInside
 
         private readonly int postNo;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="galleryId"></param>
-        /// <param name="postNo"></param>
-        /// <param name="service"></param>
+        public string GalleryId { get => galleryId; }
+
+        public int PostNo { get => postNo; }
+
         /// <exception cref="ArgumentNullException"></exception>
         internal UpvoteRequest(string galleryId, int postNo , ApiService service) : base(service)
         {
-            //매개변수 검사
+            // 매개변수 검사
             if (galleryId is null)
                 throw new ArgumentNullException(nameof(galleryId));
 
-            //필드 초기화
+            // 필드 초기화
             this.galleryId = galleryId;
             this.postNo = postNo;
         }
@@ -38,38 +36,23 @@ namespace CSInside
         /// <exception cref="CSInsideException"></exception>
         public override async Task<bool> ExecuteAsync()
         {
-            //HTTP 요청
-            string appId = AuthTokenProvider.GetAccessToken();
-            //string confirm_id = AuthTokenProvider.GetConfirmId();
+            // HTTP 요청 생성
+            string appId = base.AuthTokenProvider.GetAccessToken();
             string uri = "http://app.dcinside.com/api/_recommend_up.php";
-            string jsonString;
-            try
-            {
-                var request = new HttpRequestMessage(HttpMethod.Post, uri);
-                var keyValuePairs = new Dictionary<string, string>();
-                keyValuePairs.Add("id", galleryId);
-                keyValuePairs.Add("no", postNo.ToString());
-                keyValuePairs.Add("app_id", appId);
-                request.Content = new FormUrlEncodedContent(keyValuePairs);
-                var response = await Client.SendAsync(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError)
-                    throw new CSInsideException($"API 서버에서 Internal Server Error를 반환하였습니다. 인증 토큰이 만료되었거나 올바르지 않은 인증 토큰일 수 있습니다.");
-                response.EnsureSuccessStatusCode();
-                jsonString = await response.Content.ReadAsStringAsync();
-            }
-            catch (Exception e)
-            {
-                if (e.GetType() == typeof(CSInsideException))
-                    throw;
-                throw new CSInsideException($"예기치 않은 예외가 발생하였습니다.", e);
-            }
-            if (string.IsNullOrEmpty(jsonString))
-            {
-                throw new CSInsideException($"예기치 않은 오류: 서버에서 빈 문자열을 반환하였습니다.");
-            }
+            var request = new HttpRequestMessage(HttpMethod.Post, uri);
+            var keyValuePairs = new Dictionary<string, string>();
+            keyValuePairs.Add("id", galleryId);
+            keyValuePairs.Add("no", postNo.ToString());
+            keyValuePairs.Add("app_id", appId);
+            request.Content = new FormUrlEncodedContent(keyValuePairs);
 
-            //예외처리
-            JObject jObject = JToken.Parse(jsonString) is JObject ? JToken.Parse(jsonString) as JObject : (JToken.Parse(jsonString) as JArray)[0] as JObject;
+            // 전송
+            var task =  base.GetResponseAsync(request);
+
+            // 응답 수신
+            JObject jObject = await task;
+
+            // 예외처리
             if (!jObject.ContainsKey("result"))
                 // 
                 throw new CSInsideException($"예기치 않은 오류: 응답 본문에서 result 키를 찾을 수 없습니다.");
@@ -77,7 +60,7 @@ namespace CSInside
                 //
                 throw new CSInsideException($"예기치 않은 오류: 응답 본문에서 cause 키를 찾을 수 없습니다.");
             
-            //반환값 처리
+            // 반환값 처리
             if ((bool)jObject["result"])
                 // {"result": true, "cause": "추천 하였습니다.", "member": ""}
                 return true;

@@ -9,26 +9,24 @@ using System.Threading.Tasks;
 
 namespace CSInside
 {
-    public class PostDeleteRequest : RequestBase<string, bool?>
+    public class PostDeleteRequest : RequestBase<bool?>
     {
         private readonly string galleryId;
 
         private readonly int postNo;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="galleryId"></param>
-        /// <param name="postNo"></param>
-        /// <param name="service"></param>
+        public string GalleryId { get => galleryId; }
+
+        public int PostNo { get => postNo; }
+
         /// <exception cref="ArgumentNullException"></exception>
         internal PostDeleteRequest(string galleryId, int postNo, ApiService service) : base(service)
         {
-            //매개변수 검사
+            // 매개변수 검사
             if (galleryId is null)
                 throw new ArgumentNullException(nameof(galleryId));
 
-            //필드 초기화
+            // 필드 초기화
             this.galleryId = galleryId;
             this.postNo = postNo;
         }
@@ -38,12 +36,11 @@ namespace CSInside
         /// </summary>
         /// <returns></returns>
         /// <exception cref="CSInsideException"></exception>
-        public async Task<bool?> ExecuteAsync()
+        public override async Task<bool?> ExecuteAsync()
         {
-            //HTTP 요청
-            string appId = AuthTokenProvider.GetAccessToken();
-            string client_token = AuthTokenProvider.GetClientToken();
-            string user_id = AuthTokenProvider.GetUserToken();
+            string appId = base.AuthTokenProvider.GetAccessToken();
+            string client_token = base.AuthTokenProvider.GetClientToken();
+            string user_id = base.AuthTokenProvider.GetUserToken();
             var keyValuePairs = new Dictionary<string, string>();
             keyValuePairs.Add("mode", "board_del");
             keyValuePairs.Add("id", galleryId);
@@ -60,11 +57,10 @@ namespace CSInside
         /// <param name="password"></param>
         /// <returns></returns>
         /// <exception cref="CSInsideException"></exception>
-        public override async Task<bool?> ExecuteAsync(string password)
+        public async Task<bool?> ExecuteAsync(string password)
         {
-            //HTTP 요청
-            string appId = AuthTokenProvider.GetAccessToken();
-            string client_token = AuthTokenProvider.GetClientToken();
+            string appId = base.AuthTokenProvider.GetAccessToken();
+            string client_token = base.AuthTokenProvider.GetClientToken();
             string write_pw = password;
             var keyValuePairs = new Dictionary<string, string>();
             keyValuePairs.Add("mode", "board_del");
@@ -78,39 +74,26 @@ namespace CSInside
 
         private async Task<bool?> ExecuteAsync(Dictionary<string, string> keyValuePairs)
         {
-            string uri = Uri.EscapeUriString($"http://app.dcinside.com/api/gall_del.php");
-            string jsonString;
-            try
-            {
-                var request = new HttpRequestMessage(HttpMethod.Post, uri);
-                request.Content = new FormUrlEncodedContent(keyValuePairs);
-                var response = await Client.SendAsync(request);
-                if (response.StatusCode == HttpStatusCode.InternalServerError)
-                    throw new CSInsideException($"API 서버에서 Internal Server Error를 반환하였습니다. 인증 토큰이 만료되었거나 올바르지 않은 인증 토큰일 수 있습니다.");
-                response.EnsureSuccessStatusCode();
-                jsonString = await response.Content.ReadAsStringAsync();
-            }
-            catch (Exception e)
-            {
-                if (e.GetType() == typeof(CSInsideException))
-                    throw;
-                throw new CSInsideException($"예기치 않은 예외가 발생하였습니다.", e);
-            }
-            if (string.IsNullOrEmpty(jsonString))
-            {
-                throw new CSInsideException($"예기치 않은 오류: 서버에서 빈 문자열을 반환하였습니다.");
-            }
+            // HTTP 요청 생성
+            string uri = "http://app.dcinside.com/api/gall_del.php";
+            var request = new HttpRequestMessage(HttpMethod.Post, uri);
+            request.Content = new FormUrlEncodedContent(keyValuePairs);
 
-            //예외처리
-            JObject jObject = JToken.Parse(jsonString) is JObject ? JToken.Parse(jsonString) as JObject : (JToken.Parse(jsonString) as JArray)[0] as JObject;
+            // 전송
+            var task = base.GetResponseAsync(request);
+
+            // 응답 수신
+            JObject jObject = await task;
+
+            // 예외처리            
             if (!jObject.ContainsKey("result"))
-                // 
-                throw new CSInsideException($"예기치 않은 오류: 응답 본문에서 result 키를 찾을 수 없습니다.");
+            // 
+            throw new CSInsideException($"예기치 않은 오류: 응답 본문에서 result 키를 찾을 수 없습니다.");
             if (!(bool)jObject["result"] && ((string)jObject["cause"]).Contains("권한 오류"))
                 // {"result": false, "cause": "권한 오류"}
                 throw new CSInsideException($"삭제 권한이 존재하지 않습니다.");
 
-            //반환값 처리
+            // 반환값 처리
             if ((bool)jObject["result"])
                 // {"result": true}
                 return true;

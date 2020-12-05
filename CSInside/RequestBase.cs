@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -6,19 +8,6 @@ namespace CSInside
 {
     public abstract class RequestBase<TResult>
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        protected HttpClient Client
-        {
-            get
-            {
-                //if (Service == null)
-                //    throw new NullReferenceException();
-                return Service.Client;
-            }
-        }
-
         /// <summary>
         /// 
         /// </summary>
@@ -35,7 +24,7 @@ namespace CSInside
         /// <summary>
         /// 
         /// </summary>
-        public ApiService Service { get; }
+        private ApiService Service { get; }
 
         /// <summary>
         /// 
@@ -51,54 +40,42 @@ namespace CSInside
         /// </summary>
         /// <returns></returns>
         public abstract Task<TResult> ExecuteAsync();
-    }
 
-    public abstract class RequestBase<T, TResult>
-    {
-        /// <summary>
-        /// 
-        /// </summary>
-        protected HttpClient Client
+        protected async Task<JObject> GetResponseAsync(HttpRequestMessage request)
         {
-            get
+            string responseString;
+            try
             {
-                //if (Service == null)
-                //    throw new NullReferenceException();
-                return Service.Client;
+                var response = await Service.Client.SendAsync(request);
+                if (response.StatusCode == HttpStatusCode.InternalServerError)
+                    throw new CSInsideException($"API 서버에서 Internal Server Error를 반환하였습니다. 인증 토큰이 만료되었거나 올바르지 않은 인증 토큰일 수 있습니다.");
+                responseString = await response.Content.ReadAsStringAsync();
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        protected IAuthTokenProvider AuthTokenProvider
-        {
-            get
+            catch (Exception e)
             {
-                //if (Service == null)
-                //    throw new NullReferenceException();
-                return Service.AuthTokenProvider;
+                if (e.GetType() == typeof(CSInsideException))
+                    throw;
+                throw new CSInsideException($"예기치 않은 예외가 발생하였습니다.", e);
             }
+            if (string.IsNullOrEmpty(responseString))
+            {
+                throw new CSInsideException($"예기치 않은 오류: 서버에서 빈 문자열을 반환하였습니다.");
+            }
+
+            // Json 파싱
+            JToken jToken;
+            try
+            {
+                jToken = JToken.Parse(responseString);
+            }
+            catch (Exception e)
+            {
+                throw new CSInsideException($"Json 파싱에 실패하였습니다.", e);
+            }
+            JObject jObject = jToken is JObject ? jToken as JObject : (jToken as JArray)[0] as JObject;
+
+            // 반환값 처리
+            return jObject;
         }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ApiService Service { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="service"></param>
-        internal RequestBase(ApiService service)
-        {
-            Service = service;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public abstract Task<TResult> ExecuteAsync(T arg);
     }
 }
