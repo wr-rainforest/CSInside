@@ -85,6 +85,11 @@ namespace CSInside
             return new GallerySearchRequest(keyword, this);
         }
 
+        public PostSearchRequest CreatePostSearchRequest(string galleryId, string keyword, SearchType searchType = SearchType.All)
+        {
+            return new PostSearchRequest(galleryId, keyword, searchType, this);
+        }
+
         public void Dispose()
         {
             Client.Dispose();
