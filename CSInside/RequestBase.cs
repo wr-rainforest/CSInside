@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CSInside
 {
-    public abstract class RequestBase<TResult>
+    public abstract class RequestBase<TResult> : IRequest<TResult>
     {
         /// <summary>
         /// 
