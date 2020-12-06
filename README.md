@@ -1,47 +1,34 @@
 ## CSInside
-디시인사이드 비공식 API(app, json2)의 C# 래퍼 라이브러리입니다.  
+디시인사이드 비공식 API의 C# 클라이언트 라이브러리입니다.  
   
 [API 문서](https://wr-rainforest.github.io/CSInside/)
-## QuickStart
-```csharp
-using System.Threading.Tasks;
-using CSInside;
-namespace ConsoleApp
-{
-    class Program
-    {
-        static async Task Main(string[] args)
-        {
-            AuthTokenProvider authTokenProvider = new AuthTokenProvider();
-            //await authTokenProvider.LoginAsync("user_id", "password");
 
-            ApiService service = new ApiService(authTokenProvider);
-            //ApiService service = new ApiService(authTokenProvider, new WebProxy("127.0.0.1", 9150));
+## 기능
+ - __인증__
+   - [x] app_id  
+   - [x] 로그인  
+   - [ ] FCM  
+  
+ - __갤러리__
+   - [x] 게시글 검색  
+   - [ ] 게시글 목록 조회  
+  
+ - __게시글__
+   - [x] 게시글 조회  
+   - [ ] 게시글 작성
+   - [x] 게시글 삭제
+   - [x] 유동닉 추천 / 비추천  
+   - [ ] 고정닉 추천 / 비추천  
+  
+ - __댓글__
+   - [x] 댓글 조회
+   - [ ] 댓글 작성
+   - [ ] 댓글 삭제
 
-            PostRequest postRequest = service.CreatePostRequest("programming", 1476608);
-            Post post = await postRequest.ExecuteAsync();
-            
-            PostDeleteRequest postDeleteRequest = service.CreatePostDeleteRequest("programming", 1476608);
-            await postDeleteRequest.ExecuteAsync();
+ - __기타__
+   - [x] 프록시  
 
-            CommentListRequest commentListRequest = service.CreateCommentListRequest("programming", 1476608);
-            Comment[] comments = await commentListRequest.ExecuteAsync();
-
-            ImageRequest imageRequest = service.CreateImageRequest("https://dcimg8.dcinside.co.kr/...");
-            byte[] previewImage = await imageRequest.ExecuteAsync(ImageType.Preview);
-            byte[] webImage = await imageRequest.ExecuteAsync(ImageType.Web);
-            byte[] originalImage = await imageRequest.ExecuteAsync(ImageType.Origin);
-
-            UpvoteRequest upvoteRequest = service.CreateUpvoteRequest("programming", 1476608);
-            bool upvoteResult = await upvoteRequest.ExecuteAsync();
-
-            DownvoteRequest downvoteRequest = service.CreateDownvoteRequest("programming", 1476608);
-            bool downvoteResult = await downvoteRequest.ExecuteAsync();
-        }
-    }
-}
-```
-## 참고한 라이브러리
+## 개발에 참고한 라이브러리
 - [KotlinInside](https://github.com/organization/KotlinInside)
 - [goinside](https://github.com/geeksbaek/goinside)
 - [pyinside](https://github.com/jeongsj/pyinside)
