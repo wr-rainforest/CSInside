@@ -11,7 +11,9 @@ using System.Net.Http;
 
 namespace CSInside
 {
-    public class CommentListRequest : RequestBase<Comment[]>
+#nullable enable
+    internal class CommentListRequest : RequestBase<Comment[]?>
+#nullable restore
     {
         private readonly string galleryId;
 

@@ -11,33 +11,19 @@ using System.Net.Http;
 namespace CSInside
 {
 #nullable enable
-    public class PostRequest : RequestBase<Post?>
+    internal class PostRequest : RequestBase<Post?>
 #nullable restore
     {
         private readonly string galleryId;
 
         private readonly int postNo;
 
-        public string GalleryId { get => galleryId; }
-
-        public int PostNo { get => postNo; }
-
-        /// <exception cref="ArgumentNullException"></exception>
         internal PostRequest(string galleryId, int postNo, ApiService service) : base(service)
         {           
-            // 매개변수 검사
-            if (galleryId is null)
-                throw new ArgumentNullException(nameof(galleryId));
-
-            // 필드 초기화
             this.galleryId = galleryId;
             this.postNo = postNo;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
         /// <exception cref="CSInsideException"></exception>
 #nullable enable
         public override async Task<Post?> ExecuteAsync()

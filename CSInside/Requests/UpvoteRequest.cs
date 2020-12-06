@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
-    public class UpvoteRequest : RequestBase<bool>
+    internal class UpvoteRequest : RequestBase<bool>
     {
         private readonly string galleryId;
 

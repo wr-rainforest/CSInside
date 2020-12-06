@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace CSInside
 {
-    public class GallerySearchRequest : RequestBase<GallerySearchResult>
+    internal class GallerySearchRequest : RequestBase<GallerySearchResult>
     {
         private readonly string keyword;
 

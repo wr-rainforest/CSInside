@@ -11,7 +11,7 @@ using System.Net.Http;
 
 namespace CSInside
 {
-    public class PostSearchRequest : RequestBase<PostHeader[]>
+    internal class PostSearchRequest : RequestBase<PostHeader[]>
     {
         private readonly string galleryId;
 
@@ -84,13 +84,5 @@ namespace CSInside
             postHeaders.ForEach(item => { item.GalleryId = galleryId; });
             return postHeaders.ToArray();
         }
-    }
-    public enum SearchType
-    {
-        All = 0,
-        Title = 1,
-        Content = 2,
-        Writer = 3,
-        TitleContent = 4
     }
 }

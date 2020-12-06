@@ -7,85 +7,66 @@ using System.Threading.Tasks;
 
 namespace CSInside
 {
-    public class ApiService : IDisposable
+    public class ApiService : ServiceBase, IGalleryService, IPostService, ICommentService
     {
-        internal HttpClient Client { get; }
+        public ApiService(IAuthTokenProvider authTokenProvider) : base(authTokenProvider) { }
 
-        internal IAuthTokenProvider AuthTokenProvider { get; }
+        public ApiService(IAuthTokenProvider authTokenProvider, IWebProxy webProxy) : base(authTokenProvider, webProxy) { }
 
-        public ApiService(IAuthTokenProvider authTokenProvider)
+        #region IGalleryService
+        public IReader<PostHeader[]> CreatePostListReader(string galleryId)
         {
-            var handler = new SocketsHttpHandler()
-            {
-                AllowAutoRedirect = true,
-                AutomaticDecompression = DecompressionMethods.GZip
-            };
-            Client = new HttpClient(handler);
-            Client.DefaultRequestHeaders.Add("User-Agent", "dcinside.app");
-            Client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip");
-            Client.DefaultRequestHeaders.Add("Referer", "http://www.dcinside.com");
-            AuthTokenProvider = authTokenProvider;
+            throw new NotImplementedException();
         }
 
-        public ApiService(IAuthTokenProvider authTokenProvider, IWebProxy webProxy)
+        public IReader<PostHeader[]> CreatePostSearchReader(string galleryId, string keyword, SearchType searchType)
         {
-            var handler = new SocketsHttpHandler()
-            {
-                AllowAutoRedirect = true,
-                AutomaticDecompression = DecompressionMethods.GZip,
-                Proxy = webProxy
-            };
-            Client = new HttpClient(handler);
-            Client.DefaultRequestHeaders.Add("User-Agent", "dcinside.app");
-            Client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip");
-            Client.DefaultRequestHeaders.Add("Referer", "http://www.dcinside.com");
-            AuthTokenProvider = authTokenProvider;
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        #region IPostService
+        public IReader<Post> CreatePostReader(string galleryId, int postNo)
+        {
+            throw new NotImplementedException();
         }
 
-        /// <exception cref="ArgumentNullException"></exception>
-        public PostRequest CreatePostRequest(string galleryId, int postNo)
+        public IRequest CreatePostWriteRequest(string galleryId, string nickname, string password, object arg)
         {
-            return new PostRequest(galleryId, postNo, this);
+            throw new NotImplementedException();
         }
 
-        /// <exception cref="ArgumentNullException"></exception>
-        public CommentListRequest CreateCommentListRequest(string galleryId, int postNo)
+        public IRequest CreatePostDeleteRequest(string galleryId, int postNo)
         {
-            return new CommentListRequest(galleryId, postNo, this);
+            throw new NotImplementedException();
         }
 
-        /// <exception cref="ArgumentNullException"></exception>
-        public UpvoteRequest CreateUpvoteRequest(string galleryId, int postNo)
+        public IRequest CreatePostUpvoteRequest(string galleryId, int postNo)
         {
-            return new UpvoteRequest(galleryId, postNo, this);
+            throw new NotImplementedException();
         }
 
-        /// <exception cref="ArgumentNullException"></exception>
-        public DownvoteRequest CreateDownvoteRequest(string galleryId, int postNo)
+        public IRequest CreatePostDownvoteRequest(string galleryId, int postNo)
         {
-            return new DownvoteRequest(galleryId, postNo, this);
+            throw new NotImplementedException();
+        }
+        #endregion
+
+        #region ICommentService
+        public IReader<Comment[]> CreateCommentReader(string galleryId, int PostNo)
+        {
+            throw new NotImplementedException();
         }
 
-        /// <exception cref="ArgumentNullException"></exception>
-        public PostDeleteRequest CreatePostDeleteRequest(string galleryId, int postNo)
+        public IRequest CreateCommentWriteRequest(string galleryId, int postNo)
         {
-            return new PostDeleteRequest(galleryId, postNo, this);
+            throw new NotImplementedException();
         }
 
-        /// <exception cref="ArgumentNullException"></exception>
-        public GallerySearchRequest CreateGallerySearchRequest(string keyword)
+        public IRequest CreateCommentDeleteRequest(string galleryId, int postNo, int commentNo, string password)
         {
-            return new GallerySearchRequest(keyword, this);
+            throw new NotImplementedException();
         }
-
-        public PostSearchRequest CreatePostSearchRequest(string galleryId, string keyword, SearchType searchType = SearchType.All)
-        {
-            return new PostSearchRequest(galleryId, keyword, searchType, this);
-        }
-
-        public void Dispose()
-        {
-            Client.Dispose();
-        }
+        #endregion
     }
 }

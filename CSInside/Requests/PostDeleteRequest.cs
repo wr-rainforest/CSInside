@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace CSInside
 {
-    public class PostDeleteRequest : RequestBase<bool?>
+    internal class PostDeleteRequest : RequestBase<bool?>
     {
         private readonly string galleryId;
 

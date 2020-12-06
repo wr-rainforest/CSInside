@@ -6,11 +6,11 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSInside.Readers
+namespace CSInside
 {
-    internal abstract class Reader<TResult> : IReader<TResult>
+    internal abstract class ReaderBase<TResult> : IReader<TResult>
     {
-        public abstract int Position { get; set; }
+        public abstract int Position { get; }
 
         public abstract int Count { get; }
 
@@ -36,7 +36,7 @@ namespace CSInside.Readers
         /// 
         /// </summary>
         /// <param name="service"></param>
-        internal Reader(ApiService service)
+        internal ReaderBase(ApiService service)
         {
             Service = service;
         }
