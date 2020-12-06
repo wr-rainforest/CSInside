@@ -19,16 +19,16 @@ namespace CSInside
             throw new NotImplementedException();
         }
 
-        public IReader<PostHeader[]> CreatePostSearchReader(string galleryId, string keyword, SearchType searchType)
+        public IReader<PostHeader[]> CreatePostSearchResultReader(string galleryId, string keyword, SearchType searchType)
         {
-            throw new NotImplementedException();
+            return new PostSearchResultReader(galleryId, keyword, searchType, this);
         }
         #endregion
 
         #region IPostService
         public IReader<Post> CreatePostReader(string galleryId, int postNo)
         {
-            throw new NotImplementedException();
+            return new PostReader(galleryId, postNo, this);
         }
 
         public IRequest CreatePostWriteRequest(string galleryId, string nickname, string password, object arg)
@@ -38,24 +38,29 @@ namespace CSInside
 
         public IRequest CreatePostDeleteRequest(string galleryId, int postNo)
         {
-            throw new NotImplementedException();
+            return new PostDeleteRequest(galleryId, postNo, this);
+        }
+
+        public IRequest CreatePostDeleteRequest(string galleryId, int postNo, string password)
+        {
+            return new PostDeleteRequest(galleryId, postNo, password, this);
         }
 
         public IRequest CreatePostUpvoteRequest(string galleryId, int postNo)
         {
-            throw new NotImplementedException();
+            return new PostUpvoteRequest(galleryId, postNo, this);
         }
 
         public IRequest CreatePostDownvoteRequest(string galleryId, int postNo)
         {
-            throw new NotImplementedException();
+            return new PostDownvoteRequest(galleryId, postNo, this);
         }
         #endregion
 
         #region ICommentService
-        public IReader<Comment[]> CreateCommentReader(string galleryId, int PostNo)
+        public IReader<Comment[]> CreateCommentReader(string galleryId, int postNo)
         {
-            throw new NotImplementedException();
+            return new CommentReader(galleryId, postNo, this);
         }
 
         public IRequest CreateCommentWriteRequest(string galleryId, int postNo)

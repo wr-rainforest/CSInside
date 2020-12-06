@@ -6,11 +6,14 @@ namespace CSInside
 {
     interface IPostService
     {
-        public IReader<Post> CreatePostReader(string galleryId, int postNo);
-
+#nullable enable
+        public IReader<Post?> CreatePostReader(string galleryId, int postNo);
+#nullable restore
         public IRequest CreatePostWriteRequest(string galleryId, string nickname, string password, object arg);
 
         public IRequest CreatePostDeleteRequest(string galleryId, int postNo);
+
+        public IRequest CreatePostDeleteRequest(string galleryId, int postNo, string password);
 
         public IRequest CreatePostUpvoteRequest(string galleryId, int postNo);
 

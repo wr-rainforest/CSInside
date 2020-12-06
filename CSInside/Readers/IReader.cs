@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace CSInside
 {
     /// <summary>
-    /// Api 응답을 읽어 TResult로 변환합니다. 
+    /// 값을 가져오는 API 요청을 정의합니다.
     /// </summary>
     /// <typeparam name="TResult"></typeparam>
     public interface IReader<TResult>
@@ -15,6 +12,10 @@ namespace CSInside
 
         public int Count { get; }
 
+        /// <summary>
+        /// API 요청을 실행하고 응답을 반환합니다.
+        /// </summary>
+        /// <returns></returns>
         public Task<TResult> ReadAsync();
     }
 }

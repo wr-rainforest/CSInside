@@ -9,55 +9,22 @@ using System.Threading.Tasks;
 
 namespace CSInside
 {
-    internal class PostDeleteRequest : RequestBase<bool?>
+    internal class PostDeleteRequest : RequestBase
     {
         private readonly string galleryId;
 
         private readonly int postNo;
 
-        public string GalleryId { get => galleryId; }
-
-        public int PostNo { get => postNo; }
-
-        /// <exception cref="ArgumentNullException"></exception>
-        internal PostDeleteRequest(string galleryId, int postNo, ApiService service) : base(service)
+        #region Anonymous
+#nullable enable
+        private readonly string? password;
+#nullable restore
+        internal PostDeleteRequest(string galleryId, int postNo, string password, ApiService service) : this(galleryId, postNo, service)
         {
-            // 매개변수 검사
-            if (galleryId is null)
-                throw new ArgumentNullException(nameof(galleryId));
-
-            // 필드 초기화
-            this.galleryId = galleryId;
-            this.postNo = postNo;
+            this.password = password;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="CSInsideException"></exception>
-        public override async Task<bool?> ExecuteAsync()
-        {
-            string appId = base.AuthTokenProvider.GetAccessToken();
-            string client_token = base.AuthTokenProvider.GetClientToken();
-            string user_id = base.AuthTokenProvider.GetUserToken();
-            var keyValuePairs = new Dictionary<string, string>();
-            keyValuePairs.Add("mode", "board_del");
-            keyValuePairs.Add("id", galleryId);
-            keyValuePairs.Add("no", postNo.ToString());
-            keyValuePairs.Add("app_id", appId);
-            keyValuePairs.Add("user_id", user_id);
-            keyValuePairs.Add("client_token", client_token);
-            return await ExecuteAsync(keyValuePairs);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="password"></param>
-        /// <returns></returns>
-        /// <exception cref="CSInsideException"></exception>
-        public async Task<bool?> ExecuteAsync(string password)
+        private async Task DeleteAnonymousPost()
         {
             string appId = base.AuthTokenProvider.GetAccessToken();
             string client_token = base.AuthTokenProvider.GetClientToken();
@@ -69,10 +36,43 @@ namespace CSInside
             keyValuePairs.Add("app_id", appId);
             keyValuePairs.Add("write_pw", write_pw);
             keyValuePairs.Add("client_token", client_token);
-            return await ExecuteAsync(keyValuePairs);
+            await ExecuteAsync(keyValuePairs);
+        }
+        #endregion
+
+        #region Member
+        internal PostDeleteRequest(string galleryId, int postNo, ApiService service) : base(service)
+        {
+            this.galleryId = galleryId;
+            this.postNo = postNo;
         }
 
-        private async Task<bool?> ExecuteAsync(Dictionary<string, string> keyValuePairs)
+        private async Task DeleteMemberPost()
+        {
+            string appId = base.AuthTokenProvider.GetAccessToken();
+            string client_token = base.AuthTokenProvider.GetClientToken();
+            string user_id = base.AuthTokenProvider.GetUserToken();
+            var keyValuePairs = new Dictionary<string, string>();
+            keyValuePairs.Add("mode", "board_del");
+            keyValuePairs.Add("id", galleryId);
+            keyValuePairs.Add("no", postNo.ToString());
+            keyValuePairs.Add("app_id", appId);
+            keyValuePairs.Add("user_id", user_id);
+            keyValuePairs.Add("client_token", client_token);
+            await ExecuteAsync(keyValuePairs);
+        }
+        #endregion
+
+        /// <exception cref="CSInsideException"></exception>
+        public override async Task ExecuteAsync()
+        {
+            if (password == null)
+                await DeleteMemberPost();
+            else
+                await DeleteAnonymousPost();
+        }
+
+        private async Task ExecuteAsync(Dictionary<string, string> keyValuePairs)
         {
             // HTTP 요청 생성
             string uri = "http://app.dcinside.com/api/gall_del.php";
@@ -96,13 +96,16 @@ namespace CSInside
             // 반환값 처리
             if ((bool)jObject["result"])
                 // {"result": true}
-                return true;
+                return;
+
             if (!(bool)jObject["result"] && ((string)jObject["cause"]).Contains("비밀번호 오류"))
                 // {"result": false, "cause": "비밀번호 오류"}
-                return false;
+                throw new CSInsideException((string)jObject["cause"]);
+
             if (!(bool)jObject["result"] && ((string)jObject["cause"]).Contains("이미 삭제"))
                 // {"result": false, "cause": "이미 삭제되었습니다."}
-                return null;
+                throw new CSInsideException((string)jObject["cause"]);
+
             throw new CSInsideException($"예기치 않은 오류: 응답 처리에 실패하였습니다.{jObject.ToString(Formatting.None)}");
         }
     }

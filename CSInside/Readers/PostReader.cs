@@ -1,38 +1,45 @@
 ﻿using System;
-using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using CSInside.Extensions;
-using System.Net.Http;
 
 namespace CSInside
 {
 #nullable enable
-    internal class PostRequest : RequestBase<Post?>
+    internal class PostReader : ReaderBase<Post?>
 #nullable restore
     {
         private readonly string galleryId;
 
         private readonly int postNo;
 
-        internal PostRequest(string galleryId, int postNo, ApiService service) : base(service)
-        {           
+        private int position;
+
+        public override int Position => position;
+
+        public override int Count => 1;
+
+        internal PostReader(string galleryId, int postNo, ApiService service) : base(service)
+        {
             this.galleryId = galleryId;
             this.postNo = postNo;
+            this.position = 0;
         }
-
-        /// <exception cref="CSInsideException"></exception>
 #nullable enable
-        public override async Task<Post?> ExecuteAsync()
+        public override async Task<Post?> ReadAsync()
 #nullable restore
         {
+            if (position == 1)
+                return null;
+            position = 1;
             // HTTP 요청 생성
             string app_id = base.AuthTokenProvider.GetAccessToken();
-            string hash = $"http://app.dcinside.com/api/gall_view_new.php?id={galleryId}&no={postNo}&app_id={app_id}".ToBase64String(Encoding.ASCII);
-            string uri = Uri.EscapeUriString($"http://app.dcinside.com/api/redirect.php?hash={hash}");
+            string hash = Uri.EscapeUriString($"http://app.dcinside.com/api/gall_view_new.php?id={galleryId}&no={postNo}&app_id={app_id}").ToBase64String(Encoding.ASCII);
+            string uri = $"http://app.dcinside.com/api/redirect.php?hash={hash}";
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
             // 전송
@@ -41,7 +48,7 @@ namespace CSInside
             // 응답 수신
             JObject jObject = await task;
 
-            // 예외처리
+            // 예외 처리
             if (jObject.ContainsKey("result") && jObject.ContainsKey("cause") && (string)jObject["cause"] == "글없음")
                 // JObject: {"result": false, "cause": "글없음"}
                 return null;

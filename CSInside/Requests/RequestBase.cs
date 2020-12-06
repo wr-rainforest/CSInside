@@ -1,16 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
-    public abstract class RequestBase<TResult> : IRequest<TResult>
+    internal abstract class RequestBase : IRequest
     {
-        /// <summary>
-        /// 
-        /// </summary>
         protected IAuthTokenProvider AuthTokenProvider
         {
             get
@@ -21,25 +18,14 @@ namespace CSInside
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         private ApiService Service { get; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="service"></param>
         internal RequestBase(ApiService service)
         {
             Service = service;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public abstract Task<TResult> ExecuteAsync();
+        public abstract Task ExecuteAsync();
 
         protected async Task<JObject> GetResponseAsync(HttpRequestMessage request)
         {

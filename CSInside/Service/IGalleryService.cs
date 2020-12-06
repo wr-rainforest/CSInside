@@ -6,8 +6,10 @@ namespace CSInside
 {
     interface IGalleryService
     {
-        public IReader<PostHeader[]> CreatePostListReader(string galleryId);
+#nullable enable
+        public IReader<PostHeader[]?> CreatePostListReader(string galleryId);
 
-        public IReader<PostHeader[]> CreatePostSearchReader(string galleryId, string keyword, SearchType searchType);
+        public IReader<PostHeader[]?> CreatePostSearchResultReader(string galleryId, string keyword, SearchType searchType);
+#nullable restore
     }
 }

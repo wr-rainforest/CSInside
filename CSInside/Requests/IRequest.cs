@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace CSInside
 {
     /// <summary>
-    /// API 요청을 정의합니다.
+    /// 생성, 수정, 삭제와 관련된 API 요청을 정의합니다.
     /// </summary>
     public interface IRequest
     {

@@ -11,7 +11,7 @@ using System.Net.Http;
 
 namespace CSInside
 {
-    internal class PostSearchRequest : RequestBase<PostHeader[]>
+    internal class PostSearchResultReader : ReaderBase<PostHeader[]>
     {
         private readonly string galleryId;
 
@@ -22,15 +22,19 @@ namespace CSInside
 #nullable enable
         private int? ser_pos = null;
 #nullable restore
-        private int position;
+        private int page;
 
         private int pageCount;
 
-        public string GalleryId { get => galleryId; }
+        private int position;
 
-        public string Keyword { get => keyword; }
+        private int count;
 
-        internal PostSearchRequest(string galleryId, string keyword, SearchType searchType, ApiService service) : base(service)
+        public override int Position { get => position; }
+
+        public override int Count { get => count; }
+
+        internal PostSearchResultReader(string galleryId, string keyword, SearchType searchType, ApiService service) : base(service)
         {
             this.galleryId = galleryId;
             this.keyword = keyword;
@@ -43,20 +47,21 @@ namespace CSInside
                 SearchType.TitleContent => "subject_m",
                 _ => throw new NotImplementedException("enum")
             };
-            position = 1;
+            page = 1;
             pageCount = 1;
+            position = 0;
+            count = -1;
         }
 #nullable enable
-        public override async Task<PostHeader[]?> ExecuteAsync()
+        public override async Task<PostHeader[]?> ReadAsync()
 #nullable restore
         {
             // 상태 체크
             if (ser_pos > 0)
                 return null;
-
             // HTTP 요청 생성
             string app_id = base.AuthTokenProvider.GetAccessToken();
-            string hash = Uri.EscapeUriString($"http://app.dcinside.com/api/gall_list_new.php?id={galleryId}&page={position}&app_id={app_id}&s_type={s_type}&serVal={keyword}{(ser_pos == null ? string.Empty : $"&ser_pos={ser_pos}")}").ToBase64String(Encoding.ASCII);
+            string hash = Uri.EscapeUriString($"http://app.dcinside.com/api/gall_list_new.php?id={galleryId}&page={page}&app_id={app_id}&s_type={s_type}&serVal={keyword}{(ser_pos == null ? string.Empty : $"&ser_pos={ser_pos}")}").ToBase64String(Encoding.ASCII);
             string uri = $"http://app.dcinside.com/api/redirect.php?hash={hash}";
             var request = new HttpRequestMessage(HttpMethod.Get, uri);
 
@@ -68,15 +73,22 @@ namespace CSInside
 
             // 상태 정의
             pageCount = (int)jObject["gall_info"][0]["ser_total_page"];
-            if (pageCount >= position + 1)
+            if (pageCount >= page + 1)
             {
-                position++;
+                page++;
             }
             else
             {
-                position = 1;
+                page = 1;
                 pageCount = 1;
                 ser_pos = (int)jObject["gall_info"][0]["ser_pos"];
+                if(ser_pos < 0)
+                    position++;
+            }
+            if (count < 0 )
+            {
+                count = (-(int)jObject["gall_info"][0]["ser_pos"] / 10000) + 2;
+                position = 1;
             }
 
             // 반환값 처리

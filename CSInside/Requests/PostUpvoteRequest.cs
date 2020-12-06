@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
-    internal class DownvoteRequest : RequestBase<bool>
+    internal class PostUpvoteRequest : RequestBase
     {
         private readonly string galleryId;
 
@@ -17,33 +17,26 @@ namespace CSInside
 
         public int PostNo { get => postNo; }
 
-        /// <exception cref="ArgumentNullException"></exception>
-        internal DownvoteRequest(string galleryId, int postNo, ApiService service) : base(service)
+        internal PostUpvoteRequest(string galleryId, int postNo , ApiService service) : base(service)
         {
-            // 매개변수 검사
-            if (galleryId is null)
-                throw new ArgumentNullException(nameof(galleryId));
-
-            // 필드 초기화
             this.galleryId = galleryId;
             this.postNo = postNo;
         }
 
-        /// <exception cref="CSInsideException"></exception>
-        public override async Task<bool> ExecuteAsync()
+        public override async Task ExecuteAsync()
         {
             // HTTP 요청 생성
-            string app_id = base.AuthTokenProvider.GetAccessToken();
-            string uri = "http://app.dcinside.com/api/_recommend_down.php";
+            string appId = base.AuthTokenProvider.GetAccessToken();
+            string uri = "http://app.dcinside.com/api/_recommend_up.php";
             var request = new HttpRequestMessage(HttpMethod.Post, uri);
             var keyValuePairs = new Dictionary<string, string>();
             keyValuePairs.Add("id", galleryId);
             keyValuePairs.Add("no", postNo.ToString());
-            keyValuePairs.Add("app_id", app_id);
+            keyValuePairs.Add("app_id", appId);
             request.Content = new FormUrlEncodedContent(keyValuePairs);
 
             // 전송
-            var task = base.GetResponseAsync(request);
+            var task =  base.GetResponseAsync(request);
 
             // 응답 수신
             JObject jObject = await task;
@@ -59,11 +52,11 @@ namespace CSInside
             // 반환값 처리
             if ((bool)jObject["result"])
                 // {"result": true, "cause": "추천 하였습니다.", "member": ""}
-                return true;
+                return;
             else if (!(bool)jObject["result"])
-                // {"result": false, "cause": "비추천은 1일 1회만 가능합니다."}
-                // {"result": false, "cause": "비추천 할수 없습니다."}
-                return false;
+                // {"result": false, "cause": "추천은 1일 1회만 가능합니다."}
+                // {"result": false, "cause": "추천 할수없습니다."}
+                throw new CSInsideException((string)jObject["cause"]);
             else
                 throw new Exception();
         }
