@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -9,7 +9,7 @@ namespace CSInside
 #nullable enable
         public IReader<Post?> CreatePostReader(string galleryId, int postNo);
 #nullable restore
-        public IRequest CreatePostWriteRequest(string galleryId, string nickname, string password, object arg);
+        public IRequest CreatePostWriteRequest(string galleryId, string nickname, string password, string title, PostContent content);
 
         public IRequest CreatePostDeleteRequest(string galleryId, int postNo);
 

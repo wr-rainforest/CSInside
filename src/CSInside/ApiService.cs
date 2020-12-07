@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -31,9 +31,9 @@ namespace CSInside
             return new PostReader(galleryId, postNo, this);
         }
 
-        public IRequest CreatePostWriteRequest(string galleryId, string nickname, string password, object arg)
+        public IRequest CreatePostWriteRequest(string galleryId, string title, string nickname, string password, PostContent content)
         {
-            throw new NotImplementedException();
+            return new PostWriteRequest(galleryId, nickname, password, title, content, this);
         }
 
         public IRequest CreatePostDeleteRequest(string galleryId, int postNo)
