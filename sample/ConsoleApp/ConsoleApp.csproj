@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CSInside\CSInside.csproj" />
+    <ProjectReference Include="..\..\src\CSInside\CSInside.csproj" />
   </ItemGroup>
 
 </Project>

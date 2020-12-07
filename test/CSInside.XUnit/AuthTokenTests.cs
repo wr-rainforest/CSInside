@@ -4,7 +4,7 @@ using System.Text;
 using CSInside;
 using Xunit;
 
-namespace CSInside.Test
+namespace CSInside.XUnit
 {
     public class AuthTokenTests
     {

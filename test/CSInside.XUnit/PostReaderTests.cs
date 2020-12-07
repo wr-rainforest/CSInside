@@ -1,7 +1,7 @@
 ﻿using System;
 using Xunit;
 
-namespace CSInside.Test
+namespace CSInside.XUnit
 {
     public class PostReaderTests
     {
