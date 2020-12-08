@@ -165,10 +165,32 @@ namespace CSInside
         }
         #endregion
 
-        public IRequest CreateCommentWriteRequest(string galleryId, int postNo)
+        #region CreateCommentWriteRequest
+        public CommentWriteRequest CreateCommentWriteRequest()
         {
-            throw new NotImplementedException();
+            return new CommentWriteRequest(this);
         }
+
+        public CommentWriteRequest CreateCommentWriteRequest(string galleryId, int postNo)
+        {
+            return new CommentWriteRequest(galleryId, postNo, this);
+        }
+
+        public CommentWriteRequest CreateCommentWriteRequest(string galleryId, int postNo, Paragraph paragraph)
+        {
+            return new CommentWriteRequest(galleryId, postNo, paragraph, this);
+        }
+
+        public CommentWriteRequest CreateCommentWriteRequest(string galleryId, int postNo, string nickname, string password)
+        {
+            return new CommentWriteRequest(galleryId, postNo, nickname, password, this);
+        }
+
+        public CommentWriteRequest CreateCommentWriteRequest(string galleryId, int postNo, string nickname, string password, Paragraph paragraph)
+        {
+            return new CommentWriteRequest(galleryId, postNo, nickname, password, paragraph, this);
+        }
+        #endregion
 
         public IRequest CreateCommentDeleteRequest(string galleryId, int postNo, int commentNo, string password)
         {
