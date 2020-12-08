@@ -1,37 +1,42 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
-    internal class PostDownvoteRequest : RequestBase
+    public class PostDownvoteRequest : RequestBase
     {
-        private readonly string galleryId;
+        public RequestContent Content { get; }
 
-        private readonly int postNo;
-
-        public string GalleryId { get => galleryId; }
-
-        public int PostNo { get => postNo; }
-
-        /// <exception cref="ArgumentNullException"></exception>
-        internal PostDownvoteRequest(string galleryId, int postNo, ApiService service) : base(service)
+        #region internal ctor
+        internal PostDownvoteRequest(ApiService service) : base(service)
         {
-            // 매개변수 검사
-            if (galleryId is null)
-                throw new ArgumentNullException(nameof(galleryId));
-
-            // 필드 초기화
-            this.galleryId = galleryId;
-            this.postNo = postNo;
+            Content = new RequestContent();
         }
 
-        /// <exception cref="CSInsideException"></exception>
+        internal PostDownvoteRequest(string galleryId, int postNo, ApiService service) : base(service)
+        {
+            Content = new RequestContent(galleryId, postNo);
+        }
+        #endregion
+
+        #region public override async Task ExecuteAsync()
         public override async Task ExecuteAsync()
         {
+            // Content값 검증
+            if (string.IsNullOrEmpty(Content.GalleryId))
+                throw new CSInsideException("'Content.GalleryId'의 값을 설정해 주세요.");
+            if (Content.PostNo == default)
+                throw new CSInsideException("'Content.PostNo'의 값을 설정해주세요. ");
+            if (Content.PostNo < 1)
+                throw new CSInsideException("'Content.PostNo'의 값은 1 이상이어야 합니다.");
+
+            // 변수 초기화
+            string galleryId = Content.GalleryId;
+            int postNo = Content.PostNo;
+
             // HTTP 요청 생성
             string app_id = base.AuthTokenProvider.GetAccessToken();
             string uri = "http://app.dcinside.com/api/_recommend_down.php";
@@ -48,14 +53,6 @@ namespace CSInside
             // 응답 수신
             JObject jObject = await task;
 
-            // 예외처리
-            if (!jObject.ContainsKey("result"))
-                // 
-                throw new CSInsideException($"예기치 않은 오류: 응답 본문에서 result 키를 찾을 수 없습니다.");
-            if (!jObject.ContainsKey("cause"))
-                //
-                throw new CSInsideException($"예기치 않은 오류: 응답 본문에서 cause 키를 찾을 수 없습니다.");
-
             // 반환값 처리
             if ((bool)jObject["result"])
                 // {"result": true, "cause": "추천 하였습니다.", "member": ""}
@@ -67,5 +64,23 @@ namespace CSInside
             else
                 throw new Exception();
         }
+        #endregion
+
+        #region public class RequestContent
+        public class RequestContent
+        {
+            public string GalleryId { get; set; }
+
+            public int PostNo { get; set; }
+
+            internal RequestContent() { }
+
+            internal RequestContent(string galleryId, int postNo)
+            {
+                GalleryId = galleryId;
+                PostNo = postNo;
+            }
+        }
+        #endregion
     }
 }

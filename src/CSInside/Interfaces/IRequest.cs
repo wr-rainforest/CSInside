@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace CSInside
 {
     /// <summary>
-    /// 생성, 수정, 삭제와 관련된 API 요청을 정의합니다.
+    /// API 요청을 정의합니다.
     /// </summary>
     public interface IRequest
     {
@@ -14,5 +14,16 @@ namespace CSInside
         /// API 요청을 실행합니다.
         /// </summary>
         public Task ExecuteAsync();
+    }
+
+    /// <summary>
+    /// API 요청을 정의합니다.
+    /// </summary>
+    public interface IRequest<TResult>
+    {
+        /// <summary>
+        /// API 요청을 실행합니다.
+        /// </summary>
+        public Task<TResult> ExecuteAsync();
     }
 }

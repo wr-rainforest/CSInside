@@ -1,30 +1,42 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
-    internal class PostUpvoteRequest : RequestBase
+    public class PostUpvoteRequest : RequestBase
     {
-        private readonly string galleryId;
+        public RequestContent Content { get; }
 
-        private readonly int postNo;
-
-        public string GalleryId { get => galleryId; }
-
-        public int PostNo { get => postNo; }
-
-        internal PostUpvoteRequest(string galleryId, int postNo , ApiService service) : base(service)
+        #region internal ctor
+        internal PostUpvoteRequest(ApiService service) : base(service)
         {
-            this.galleryId = galleryId;
-            this.postNo = postNo;
+            Content = new RequestContent();
         }
 
+        internal PostUpvoteRequest(string galleryId, int postNo, ApiService service) : base(service)
+        {
+            Content = new RequestContent(galleryId, postNo);
+        }
+        #endregion
+
+        #region public override async Task ExecuteAsync()
         public override async Task ExecuteAsync()
         {
+            // Content값 검증
+            if (string.IsNullOrEmpty(Content.GalleryId))
+                throw new CSInsideException("'Content.GalleryId'의 값을 설정해 주세요.");
+            if (Content.PostNo == default)
+                throw new CSInsideException("'Content.PostNo'의 값을 설정해주세요. ");
+            if (Content.PostNo < 1)
+                throw new CSInsideException("'Content.PostNo'의 값은 1 이상이어야 합니다.");
+
+            // 변수 초기화
+            string galleryId = Content.GalleryId;
+            int postNo = Content.PostNo;
+
             // HTTP 요청 생성
             string appId = base.AuthTokenProvider.GetAccessToken();
             string uri = "http://app.dcinside.com/api/_recommend_up.php";
@@ -60,5 +72,23 @@ namespace CSInside
             else
                 throw new Exception();
         }
+        #endregion
+
+        #region public class RequestContent
+        public class RequestContent
+        {
+            public string GalleryId { get; set; }
+
+            public int PostNo { get; set; }
+
+            internal RequestContent() { }
+
+            internal RequestContent(string galleryId, int postNo)
+            {
+                GalleryId = galleryId;
+                PostNo = postNo;
+            }
+        }
+        #endregion
     }
 }

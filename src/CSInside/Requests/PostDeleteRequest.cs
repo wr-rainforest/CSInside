@@ -1,30 +1,59 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
-    internal class PostDeleteRequest : RequestBase
+    public class PostDeleteRequest : RequestBase
     {
-        private readonly string galleryId;
+        public RequestContent Content { get; }
 
-        private readonly int postNo;
-
-        #region Anonymous
-#nullable enable
-        private readonly string? password;
-#nullable restore
-        internal PostDeleteRequest(string galleryId, int postNo, string password, ApiService service) : this(galleryId, postNo, service)
+        #region internal ctor
+        internal PostDeleteRequest(ApiService service) : base(service)
         {
-            this.password = password;
+            Content = new RequestContent();
         }
 
-        private async Task DeleteAnonymousPost()
+        internal PostDeleteRequest(string galleryId, int postNo, string password, ApiService service) : base(service)
+        {
+            Content = new RequestContent(galleryId, postNo, password);
+        }
+
+        internal PostDeleteRequest(string galleryId, int postNo, ApiService service) : base(service)
+        {
+            Content = new RequestContent(galleryId, postNo);
+        }
+        #endregion
+
+        #region public override async Task ExecuteAsync()
+#nullable enable
+        public override async Task ExecuteAsync()
+        {
+            // Content값 검증
+            if (string.IsNullOrEmpty(Content.GalleryId))
+                throw new CSInsideException("'Content.GalleryId'의 값을 설정해 주세요.");
+            if (Content.PostNo == default)
+                throw new CSInsideException("'Content.PostNo'의 값을 설정해주세요. ");
+            if (Content.PostNo < 1)
+                throw new CSInsideException("'Content.PostNo'의 값은 1 이상이어야 합니다.");
+            if (string.IsNullOrEmpty(Content.Password))
+                throw new CSInsideException("'Content.Password'의 값을 설정해 주세요.");
+
+            string galleryId = Content.GalleryId;
+            int postNo = Content.PostNo;
+            string? password = Content.Password;
+            if (password == null)
+                await DeleteMemberPost(galleryId, postNo);
+            else
+                await DeleteAnonymousPost(galleryId, postNo, password);
+        }
+#nullable restore
+        #endregion
+
+        #region private async Task DeleteAnonymousPost(string galleryId, int postNo, string password)
+        private async Task DeleteAnonymousPost(string galleryId, int postNo, string password)
         {
             string appId = base.AuthTokenProvider.GetAccessToken();
             string client_token = base.AuthTokenProvider.GetClientToken();
@@ -40,14 +69,8 @@ namespace CSInside
         }
         #endregion
 
-        #region Member
-        internal PostDeleteRequest(string galleryId, int postNo, ApiService service) : base(service)
-        {
-            this.galleryId = galleryId;
-            this.postNo = postNo;
-        }
-
-        private async Task DeleteMemberPost()
+        #region private async Task DeleteMemberPost(string galleryId, int postNo)
+        private async Task DeleteMemberPost(string galleryId, int postNo)
         {
             string appId = base.AuthTokenProvider.GetAccessToken();
             string client_token = base.AuthTokenProvider.GetClientToken();
@@ -63,15 +86,7 @@ namespace CSInside
         }
         #endregion
 
-        /// <exception cref="CSInsideException"></exception>
-        public override async Task ExecuteAsync()
-        {
-            if (password == null)
-                await DeleteMemberPost();
-            else
-                await DeleteAnonymousPost();
-        }
-
+        #region private async Task ExecuteAsync(Dictionary<string, string> keyValuePairs)
         private async Task ExecuteAsync(Dictionary<string, string> keyValuePairs)
         {
             // HTTP 요청 생성
@@ -89,24 +104,49 @@ namespace CSInside
             if (!jObject.ContainsKey("result"))
             // 
             throw new CSInsideException($"예기치 않은 오류: 응답 본문에서 result 키를 찾을 수 없습니다.");
-            if (!(bool)jObject["result"] && ((string)jObject["cause"]).Contains("권한 오류"))
-                // {"result": false, "cause": "권한 오류"}
-                throw new CSInsideException($"삭제 권한이 존재하지 않습니다.");
 
             // 반환값 처리
             if ((bool)jObject["result"])
                 // {"result": true}
                 return;
-
             if (!(bool)jObject["result"] && ((string)jObject["cause"]).Contains("비밀번호 오류"))
                 // {"result": false, "cause": "비밀번호 오류"}
                 throw new CSInsideException((string)jObject["cause"]);
-
             if (!(bool)jObject["result"] && ((string)jObject["cause"]).Contains("이미 삭제"))
                 // {"result": false, "cause": "이미 삭제되었습니다."}
                 throw new CSInsideException((string)jObject["cause"]);
+            if (!(bool)jObject["result"] && ((string)jObject["cause"]).Contains("권한 오류"))
+                // {"result": false, "cause": "권한 오류"}
+                throw new CSInsideException($"삭제 권한이 존재하지 않습니다.");
 
             throw new CSInsideException($"예기치 않은 오류: 응답 처리에 실패하였습니다.{jObject.ToString(Formatting.None)}");
         }
+        #endregion
+
+        #region public class RequestContent
+        public class RequestContent
+        {
+            public string GalleryId { get; set; }
+
+            public int PostNo { get; set; }
+#nullable enable
+            public string? Password { get; set; }
+#nullable restore
+            internal RequestContent() { }
+
+            internal RequestContent(string galleryId, int postNo)
+            {
+                GalleryId = galleryId;
+                PostNo = postNo;
+            }
+
+            internal RequestContent(string galleryId, int postNo, string password)
+            {
+                GalleryId = galleryId;
+                PostNo = postNo;
+                Password = password;
+            }
+        }
+        #endregion
     }
 }

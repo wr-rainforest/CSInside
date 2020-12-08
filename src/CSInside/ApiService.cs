@@ -7,61 +7,163 @@ using System.Threading.Tasks;
 
 namespace CSInside
 {
-    public class ApiService : ServiceBase, IGalleryService, IPostService, ICommentService
+    public class ApiService : IDisposable
     {
-        public ApiService(IAuthTokenProvider authTokenProvider) : base(authTokenProvider) { }
+        #region Property
+        internal HttpClient Client { get; }
 
-        public ApiService(IAuthTokenProvider authTokenProvider, IWebProxy webProxy) : base(authTokenProvider, webProxy) { }
+        internal IAuthTokenProvider AuthTokenProvider { get; }
+        #endregion
 
-        #region IGalleryService
-        public IReader<PostHeader[]> CreatePostListReader(string galleryId)
+        #region public ctor
+        public ApiService(IAuthTokenProvider authTokenProvider)
+        {
+            var handler = new SocketsHttpHandler()
+            {
+                AllowAutoRedirect = true,
+                AutomaticDecompression = DecompressionMethods.GZip
+            };
+            Client = new HttpClient(handler);
+            Client.DefaultRequestHeaders.Add("User-Agent", "dcinside.app");
+            Client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip");
+            Client.DefaultRequestHeaders.Add("Referer", "http://www.dcinside.com");
+            AuthTokenProvider = authTokenProvider;
+        }
+
+        public ApiService(IAuthTokenProvider authTokenProvider, IWebProxy webProxy)
+        {
+            var handler = new SocketsHttpHandler()
+            {
+                AllowAutoRedirect = true,
+                AutomaticDecompression = DecompressionMethods.GZip,
+                Proxy = webProxy
+            };
+            Client = new HttpClient(handler);
+            Client.DefaultRequestHeaders.Add("User-Agent", "dcinside.app");
+            Client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip");
+            Client.DefaultRequestHeaders.Add("Referer", "http://www.dcinside.com");
+            AuthTokenProvider = authTokenProvider;
+        }
+        #endregion
+
+        public IRequest CreatePostListRequest(string galleryId, int pageNo)
         {
             throw new NotImplementedException();
         }
 
-        public IReader<PostHeader[]> CreatePostSearchResultReader(string galleryId, string keyword, SearchType searchType)
+        #region CreatePostSearchRequest
+        public PostSearchRequest CreatePostSearchRequest()
         {
-            return new PostSearchResultReader(galleryId, keyword, searchType, this);
+            return new PostSearchRequest(this);
+        }
+
+        public PostSearchRequest CreatePostSearchRequest(string galleryId, string keyword, SearchType searchType)
+        {
+            return new PostSearchRequest(galleryId, keyword, searchType, this);
+        }
+
+        public PostSearchRequest CreatePostSearchRequest(string galleryId, string keyword, SearchType searchType, int from)
+        {
+            return new PostSearchRequest(galleryId, keyword, searchType, from, this);
+        }
+
+        public PostSearchRequest CreatePostSearchRequest(string galleryId, string keyword, SearchType searchType, int from, int pageNo)
+        {
+            return new PostSearchRequest(galleryId, keyword, searchType, from, pageNo, this);
         }
         #endregion
 
-        #region IPostService
-        public IReader<Post> CreatePostReader(string galleryId, int postNo)
+        #region CreatePostRequest
+        public PostRequest CreatePostRequest()
         {
-            return new PostReader(galleryId, postNo, this);
+            return new PostRequest(this);
         }
 
-        public IRequest CreatePostWriteRequest(string galleryId, string title, string nickname, string password, PostContent content)
+        public PostRequest CreatePostRequest(string galleryId, int postNo)
         {
-            return new PostWriteRequest(galleryId, nickname, password, title, content, this);
+            return new PostRequest(galleryId, postNo, this);
+        }
+        #endregion
+
+        #region CreatePostWriteRequest
+        public PostWriteRequest CreatePostWriteRequest()
+        {
+            return new PostWriteRequest(this);
         }
 
-        public IRequest CreatePostDeleteRequest(string galleryId, int postNo)
+        public PostWriteRequest CreatePostWriteRequest(string galleryId, string title)
+        {
+            return new PostWriteRequest(galleryId, title, this);
+        }
+
+        public PostWriteRequest CreatePostWriteRequest(string galleryId, string title, ParagraphCollection paragraphs)
+        {
+            return new PostWriteRequest(galleryId, title, paragraphs, this);
+        }
+
+        public PostWriteRequest CreatePostWriteRequest(string galleryId, string title, string nickname, string password)
+        {
+            return new PostWriteRequest(galleryId, title, nickname, password, this);
+        }
+
+        public PostWriteRequest CreatePostWriteRequest(string galleryId, string title, string nickname, string password, ParagraphCollection paragraphs)
+        {
+            return new PostWriteRequest(galleryId, title, nickname, password, paragraphs, this);
+        }
+        #endregion
+
+        #region CreatePostDeleteRequest
+        public PostDeleteRequest CreatePostDeleteRequest()
+        {
+            return new PostDeleteRequest(this);
+        }
+
+        public PostDeleteRequest CreatePostDeleteRequest(string galleryId, int postNo)
         {
             return new PostDeleteRequest(galleryId, postNo, this);
         }
 
-        public IRequest CreatePostDeleteRequest(string galleryId, int postNo, string password)
+        public PostDeleteRequest CreatePostDeleteRequest(string galleryId, int postNo, string password)
         {
             return new PostDeleteRequest(galleryId, postNo, password, this);
         }
+        #endregion
 
-        public IRequest CreatePostUpvoteRequest(string galleryId, int postNo)
+        #region CreatePostUpvoteRequest
+        public PostUpvoteRequest CreatePostUpvoteRequest()
+        {
+            return new PostUpvoteRequest(this);
+        }
+
+        public PostUpvoteRequest CreatePostUpvoteRequest(string galleryId, int postNo)
         {
             return new PostUpvoteRequest(galleryId, postNo, this);
         }
+        #endregion
 
-        public IRequest CreatePostDownvoteRequest(string galleryId, int postNo)
+        #region CreatePostDownvoteRequest
+        public PostDownvoteRequest CreatePostDownvoteRequest()
+        {
+            return new PostDownvoteRequest(this);
+        }
+
+        public PostDownvoteRequest CreatePostDownvoteRequest(string galleryId, int postNo)
         {
             return new PostDownvoteRequest(galleryId, postNo, this);
         }
         #endregion
 
-        #region ICommentService
-        public IReader<Comment[]> CreateCommentReader(string galleryId, int postNo)
+        #region CreateCommentRequest
+        public CommentRequest CreateCommentRequest()
         {
-            return new CommentReader(galleryId, postNo, this);
+            return new CommentRequest(this);
         }
+
+        public CommentRequest CreateCommentRequest(string galleryId, int postNo)
+        {
+            return new CommentRequest(galleryId, postNo, this);
+        }
+        #endregion
 
         public IRequest CreateCommentWriteRequest(string galleryId, int postNo)
         {
@@ -71,6 +173,12 @@ namespace CSInside
         public IRequest CreateCommentDeleteRequest(string galleryId, int postNo, int commentNo, string password)
         {
             throw new NotImplementedException();
+        }
+
+        #region IDisposable
+        public void Dispose()
+        {
+            ((IDisposable)Client).Dispose();
         }
         #endregion
     }
