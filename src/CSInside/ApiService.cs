@@ -46,10 +46,17 @@ namespace CSInside
         }
         #endregion
 
-        public IRequest CreatePostListRequest(string galleryId, int pageNo)
+        #region CreatePostListRequest
+        public PostListRequest CreatePostListRequest()
         {
-            throw new NotImplementedException();
+            return new PostListRequest(this);
         }
+
+        public PostListRequest CreatePostListRequest(string galleryId, int pageNo)
+        {
+            return new PostListRequest(galleryId, pageNo, this);
+        }
+        #endregion
 
         #region CreatePostSearchRequest
         public PostSearchRequest CreatePostSearchRequest()
