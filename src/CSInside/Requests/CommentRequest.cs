@@ -10,13 +10,19 @@ using CSInside.Extensions;
 
 namespace CSInside
 {
+    /// <summary>
+    /// 댓글 조회 API 요청을 나타냅니다.
+    /// </summary>
 #nullable enable
     public class CommentRequest : RequestBase<Comment[]?>
 #nullable restore
     {
+        /// <summary>
+        /// 요청 변수를 가져옵니다.
+        /// </summary>
         public RequestContent Content { get; }
 
-        #region internal ctor
+        #region ctor
         internal CommentRequest(ApiService service) : base(service)
         {
             Content = new RequestContent();
@@ -28,7 +34,14 @@ namespace CSInside
         }
         #endregion
 
-        #region public override async Task<Comment[]?> ExecuteAsync()
+        /// <summary>
+        /// API 요청을 실행합니다.
+        /// </summary>
+        /// <returns>댓글 목록입니다.
+        /// <br></br>
+        /// <br></br>
+        /// 게시글이 존재하지 않거나, 댓글이 0개일 경우 null을 반환합니다.</returns>
+        /// <exception cref="CSInsideException"></exception>
 #nullable enable
         public override async Task<Comment[]?> ExecuteAsync()
 #nullable restore
@@ -79,13 +92,17 @@ namespace CSInside
             comments.ForEach(item => { item.GalleryId = galleryId; item.PostNo = postNo; });
             return comments.Distinct().ToArray();
         }
-        #endregion
 
-        #region public class RequestContent
         public class RequestContent
         {
+            /// <summary>
+            /// 갤러리 ID (필수 요청 변수)
+            /// </summary>
             public string GalleryId { get; set; }
 
+            /// <summary>
+            /// 게시글 번호 (필수 요청 변수)
+            /// </summary>
             public int PostNo { get; set; }
 
             internal RequestContent() { }
@@ -96,6 +113,5 @@ namespace CSInside
                 PostNo = postNo;
             }
         }
-        #endregion
     }
 }

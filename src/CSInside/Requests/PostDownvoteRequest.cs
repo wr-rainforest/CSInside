@@ -6,11 +6,17 @@ using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
+    /// <summary>
+    /// 게시글 비추천 API 요청을 나타냅니다.
+    /// </summary>
     public class PostDownvoteRequest : RequestBase
     {
+        /// <summary>
+        /// 요청 변수를 가져옵니다.
+        /// </summary>
         public RequestContent Content { get; }
 
-        #region internal ctor
+        #region ctor
         internal PostDownvoteRequest(ApiService service) : base(service)
         {
             Content = new RequestContent();
@@ -22,7 +28,11 @@ namespace CSInside
         }
         #endregion
 
-        #region public override async Task ExecuteAsync()
+        /// <summary>
+        /// API 요청을 실행합니다.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="CSInsideException"></exception>
         public override async Task ExecuteAsync()
         {
             // Content값 검증
@@ -64,13 +74,17 @@ namespace CSInside
             else
                 throw new Exception();
         }
-        #endregion
 
-        #region public class RequestContent
         public class RequestContent
         {
+            /// <summary>
+            /// 갤러리 ID (필수 요청 변수)
+            /// </summary>
             public string GalleryId { get; set; }
 
+            /// <summary>
+            /// 게시글 번호 (필수 요청 변수)
+            /// </summary>
             public int PostNo { get; set; }
 
             internal RequestContent() { }
@@ -81,6 +95,5 @@ namespace CSInside
                 PostNo = postNo;
             }
         }
-        #endregion
     }
 }

@@ -8,10 +8,16 @@ using CSInside.Extensions;
 
 namespace CSInside
 {
+    /// <summary>
+    /// 갤러리 내 게시글 검색 API 요청을 나타냅니다.
+    /// </summary>
 #nullable enable
     public class PostSearchRequest : RequestBase<PostSearchResult?>
 #nullable restore
     {
+        /// <summary>
+        /// 요청 변수를 가져옵니다.
+        /// </summary>
         public RequestContent Content { get; }
 
         #region ctor
@@ -36,18 +42,22 @@ namespace CSInside
         }
         #endregion
 
-        #region public override async Task<PostSearchResult?> ExecuteAsync()
+        /// <summary>
+        /// API 요청을 실행합니다.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="CSInsideException"></exception>
 #nullable enable
         public override async Task<PostSearchResult?> ExecuteAsync()
 #nullable restore
         {
             // Content값 검증
             if (string.IsNullOrEmpty(Content.GalleryId))
-                throw new CSInsideException("'Content.GalleryId'의 값을 설정해 주세요.");
+                throw new CSInsideException("'Content.GalleryId' 는 필수 요청 변수입니다.");
             if (string.IsNullOrEmpty(Content.Keyword))
-                throw new CSInsideException("'Content.Keyword'의 값을 설정해주세요. ");
+                throw new CSInsideException("'Content.Keyword' 값이 설정되지 않았습니다");
             if (Content.PageNo < 1)
-                throw new CSInsideException("'Content.PageNo'의 값은 1 이상이어야 합니다.");
+                throw new CSInsideException("'Content.PageNo'는 1 이상이어야 합니다.");
 
             // 변수 초기화
             string galleryId = Content.GalleryId;
@@ -101,21 +111,35 @@ namespace CSInside
             var result = new PostSearchResult((from, to), _pageNo, pageCount, postHeaders.ToArray());
             return result;
         }
-        #endregion
 
-        #region public class RequestContent
         public class RequestContent
         {
+            /// <summary>
+            /// 갤러리ID (필수 요청 변수)
+            /// </summary>
             public string GalleryId { get; set; }
 
+            /// <summary>
+            /// 검색어 (필수 요청 변수)
+            /// </summary>
             public string Keyword { get; set; }
 
+            /// <summary>
+            /// 검색 유형 (필수 요청 변수)
+            /// </summary>
             public SearchType SearchType { get; set; }
 #nullable enable
+            /// <summary>
+            /// 검색을 시작할 위치입니다. (선택 요청 변수)
+            /// </summary>
             public int? From { get; set; }
 #nullable restore
+            /// <summary>
+            /// 검색 범위 내 위치를 지정합니다. (필수 요청 변수) 기본값은 1입니다.
+            /// </summary>
             public int PageNo { get; set; }
 
+            #region ctor
             internal RequestContent() 
             {
                 SearchType = SearchType.All;
@@ -149,7 +173,7 @@ namespace CSInside
                 From = from;
                 PageNo = pageNo;
             }
+            #endregion
         }
-        #endregion
     }
 }

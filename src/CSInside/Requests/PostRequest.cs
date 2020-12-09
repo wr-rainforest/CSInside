@@ -9,13 +9,19 @@ using CSInside.Extensions;
 
 namespace CSInside
 {
+    /// <summary>
+    /// 게시글 조회 API 요청을 나타냅니다.
+    /// </summary>
 #nullable enable
     public class PostRequest : RequestBase<Post?>
 #nullable restore
     {
+        /// <summary>
+        /// 요청 변수를 가져옵니다.
+        /// </summary>
         public RequestContent Content { get; }
 
-        #region internal ctor
+        #region ctor
         internal PostRequest(ApiService service) : base(service)
         {
             Content = new RequestContent();
@@ -27,7 +33,11 @@ namespace CSInside
         }
         #endregion
 
-        #region public override async Task<Post?> ExecuteAsync()
+        /// <summary>
+        /// API 요청을 실행합니다.
+        /// </summary>
+        /// <returns>게시글이 존재하지 않거나, 접근 불가능한 게시글일 경우 null을 반환합니다.</returns>
+        /// <exception cref="CSInsideException"></exception>
 #nullable enable
         public override async Task<Post?> ExecuteAsync()
 #nullable restore
@@ -82,13 +92,17 @@ namespace CSInside
             post.DownvoteCount = int.Parse(jObject["view_main"]["nonrecommend"].ToString());
             return post;
         }
-        #endregion
 
-        #region public class RequestContent
         public class RequestContent
         {
+            /// <summary>
+            /// 갤러리 ID (필수 요청 변수)
+            /// </summary>
             public string GalleryId { get; set; }
 
+            /// <summary>
+            /// 게시글 번호 (필수 요청 변수)
+            /// </summary>
             public int PostNo { get; set; }
 
             internal RequestContent() { }
@@ -99,6 +113,5 @@ namespace CSInside
                 PostNo = postNo;
             }
         }
-        #endregion
     }
 }

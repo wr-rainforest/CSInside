@@ -6,11 +6,17 @@ using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
+    /// <summary>
+    /// 게시글 삭제 API 요청을 나타냅니다.
+    /// </summary>
     public class PostDeleteRequest : RequestBase
     {
+        /// <summary>
+        /// 요청 변수를 가져옵니다.
+        /// </summary>
         public RequestContent Content { get; }
 
-        #region internal ctor
+        #region ctor
         internal PostDeleteRequest(ApiService service) : base(service)
         {
             Content = new RequestContent();
@@ -27,8 +33,11 @@ namespace CSInside
         }
         #endregion
 
-        #region public override async Task ExecuteAsync()
-#nullable enable
+        /// <summary>
+        /// API 요청을 실행합니다.
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="CSInsideException"></exception>
         public override async Task ExecuteAsync()
         {
             // Content값 검증
@@ -43,16 +52,13 @@ namespace CSInside
 
             string galleryId = Content.GalleryId;
             int postNo = Content.PostNo;
-            string? password = Content.Password;
+            string password = Content.Password;
             if (password == null)
                 await DeleteMemberPost(galleryId, postNo);
             else
                 await DeleteAnonymousPost(galleryId, postNo, password);
         }
-#nullable restore
-        #endregion
 
-        #region private async Task DeleteAnonymousPost(string galleryId, int postNo, string password)
         private async Task DeleteAnonymousPost(string galleryId, int postNo, string password)
         {
             string appId = base.AuthTokenProvider.GetAccessToken();
@@ -67,9 +73,7 @@ namespace CSInside
             keyValuePairs.Add("client_token", client_token);
             await ExecuteAsync(keyValuePairs);
         }
-        #endregion
 
-        #region private async Task DeleteMemberPost(string galleryId, int postNo)
         private async Task DeleteMemberPost(string galleryId, int postNo)
         {
             string appId = base.AuthTokenProvider.GetAccessToken();
@@ -84,9 +88,7 @@ namespace CSInside
             keyValuePairs.Add("client_token", client_token);
             await ExecuteAsync(keyValuePairs);
         }
-        #endregion
 
-        #region private async Task ExecuteAsync(Dictionary<string, string> keyValuePairs)
         private async Task ExecuteAsync(Dictionary<string, string> keyValuePairs)
         {
             // HTTP 요청 생성
@@ -121,15 +123,22 @@ namespace CSInside
 
             throw new CSInsideException($"예기치 않은 오류: 응답 처리에 실패하였습니다.{jObject.ToString(Formatting.None)}");
         }
-        #endregion
 
-        #region public class RequestContent
         public class RequestContent
         {
+            /// <summary>
+            /// 갤러리 ID (필수 요청 변수)
+            /// </summary>
             public string GalleryId { get; set; }
 
+            /// <summary>
+            /// 삭제할 게시글의 번호입니다. (필수 요청 변수)
+            /// </summary>
             public int PostNo { get; set; }
 #nullable enable
+            /// <summary>
+            /// 유동 게시글의 비밀번호입니다. (선택 요청 변수)
+            /// </summary>
             public string? Password { get; set; }
 #nullable restore
             internal RequestContent() { }
@@ -147,6 +156,5 @@ namespace CSInside
                 Password = password;
             }
         }
-        #endregion
     }
 }

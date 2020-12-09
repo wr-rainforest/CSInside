@@ -9,11 +9,17 @@ using Newtonsoft.Json.Linq;
 
 namespace CSInside
 {
+    /// <summary>
+    /// 게시글 작성 API 요청을 나타냅니다.
+    /// </summary>
     public class PostWriteRequest : RequestBase<int>
     {
+        /// <summary>
+        /// 요청 변수를 가져옵니다.
+        /// </summary>
         public RequestContent Content { get; }
 
-        #region internal ctor
+        #region ctor
         internal PostWriteRequest(ApiService service) : base(service)
         {
             Content = new RequestContent();
@@ -40,7 +46,11 @@ namespace CSInside
         }
         #endregion
 
-        #region public override async Task<int> ExecuteAsync()
+        /// <summary>
+        /// API 요청을 실행합니다.
+        /// </summary>
+        /// <returns>작성한 게시글의 번호입니다.</returns>
+        /// <exception cref="CSInsideException"></exception>
         public override async Task<int> ExecuteAsync()
         {
             // Content값 검증
@@ -133,21 +143,34 @@ namespace CSInside
             else
                 throw new CSInsideException((string)jObject["cause"]);
         }
-        #endregion
 
-        #region public class RequestContent
         public class RequestContent
         {
+            /// <summary>
+            /// 갤러리 ID (필수 요청 변수)
+            /// </summary>
             public string GalleryId { get; set; }
 
+            /// <summary>
+            /// 게시글 제목입니다. (필수 요청 변수)
+            /// </summary>
             public string Title { get; set; }
 #nullable enable
+            /// <summary>
+            /// 유동으로 게시글을 작성할 시 사용할 닉네임입니다. (선택 요청 변수)
+            /// </summary>
             public string? Nickname { get; set; }
 
+            /// <summary>
+            /// 유동으로 게시글을 작성할 시 사용할 비밀번호입니다. (선택 요청 변수)
+            /// </summary>
             public string? Password { get; set; }
 #nullable restore
+            /// <summary>
+            /// 문단 컬렉션입니다. (필수 요청 변수)
+            /// </summary>
             public ParagraphCollection Paragraphs { get; set; }
-
+            #region ctor
             internal RequestContent()
             {
                 Paragraphs = new ParagraphCollection();
@@ -184,7 +207,7 @@ namespace CSInside
                 Password = password;
                 Paragraphs = paragraphs;
             }
+            #endregion
         }
-        #endregion
     }
 }
