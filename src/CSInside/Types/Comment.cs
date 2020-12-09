@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -6,55 +6,78 @@ using System.Text;
 
 namespace CSInside
 {
+    /// <summary>
+    /// 댓글
+    /// </summary>
     public class Comment : IComparable<Comment>
     {
-        [JsonProperty("gallery_id")]
+        /// <summary>
+        /// 갤러리 ID
+        /// </summary>
         public string GalleryId { get; set; }
 
-        [JsonProperty("post_no")]
+        /// <summary>
+        /// 게시글 번호
+        /// </summary>
         public int PostNo { get; set; }
 
+        /// <summary>
+        /// 댓글 번호
+        /// </summary>
         [JsonProperty("comment_no")]
         public int CommentNo { get; set; }
 
+        /// <summary>
+        /// 작성자 닉네임
+        /// </summary>
         [JsonProperty("name")]
-        private string Name { set => Writer = value; }
-        [JsonProperty("writer")]
         public string Writer { get; set; }
 
+        /// <summary>
+        /// 작성자 ID (유동닉일 경우 null)
+        /// </summary>
         [JsonProperty("user_id")]
-        private string userid { set => WriterId = value; }
-        [JsonProperty("writer_id")]
-        public string WriterId { get; set; }
+        public string? WriterId { get; set; }
 
+        /// <summary>
+        /// 작성자 ID (고닉일 경우 null)
+        /// </summary>
         [JsonProperty("ipData")]
-        private string ip { set => WriterIp = value; }
-        [JsonProperty("writer_ip")]
-        public string WriterIp { get; set; }
+        public string? WriterIp { get; set; }
 
+        /// <summary>
+        /// 댓글 본문
+        /// </summary>
         [JsonProperty("comment_memo")]
-        private string CommentMemo { set => Body = value; }
-        [JsonProperty("body")]
         public string Body { get; set; }
 
         [JsonProperty("date_time")]
-        private string DateTime { set => TimeStamp = System.DateTime.ParseExact(value, "yyyy.MM.dd HH:mm", null); }
-        [JsonProperty("timestamp")]
+        private string DateTime 
+        {
+            get => TimeStamp.ToString("yyyy.MM.dd HH:mm");
+            set => TimeStamp = System.DateTime.ParseExact(value, "yyyy.MM.dd HH:mm", null);
+        }
+        /// <summary>
+        /// 댓글 작성 시간 (yyyy.MM.dd HH:mm)
+        /// </summary>
         public DateTime TimeStamp { get; set; }
 
+        /// <summary>
+        /// 답글 여부
+        /// </summary>
         [JsonProperty("under_step")]
-        private bool UnderStep { set => IsReply = value; }
-        [JsonProperty("is_reply")]
         public bool IsReply { get; set; }
 
+        /// <summary>
+        /// 디시콘 uri
+        /// </summary>
         [JsonProperty("dccon")]
-        private string DCCon { set => DCConUri = value; }
-        [JsonProperty("dccon_uri")]
-        public string DCConUri { get; set; }
+        public string? DCConUri { get; set; }
 
+        /// <summary>
+        /// 디시콘 
+        /// </summary>
         [JsonProperty("dccon_detail_idx")]
-        private int? DCConDetailIdx { set => DCConDetailIndex = value; }
-        [JsonProperty("dccon_detail_index")]
         public int? DCConDetailIndex { get; set; }
 
         [JsonProperty("member_icon")]

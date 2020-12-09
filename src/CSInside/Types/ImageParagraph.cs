@@ -5,6 +5,9 @@ using System.Text;
 
 namespace CSInside
 {
+    /// <summary>
+    /// 게시글의 이미지 단락을 나타냅니다.
+    /// </summary>
     public class ImageParagraph : Paragraph
     {
         public string Extension { get => GetImageExtension((byte[])Content); }
@@ -23,6 +26,10 @@ namespace CSInside
             }
         }
 
+        /// <summary>
+        /// <paramref name="image"/>를 사용하여 <seealso cref="ImageParagraph"/>의 새 인스턴스를 초기화합니다. 
+        /// </summary>
+        /// <param name="image">jpg, png, gif</param>
         public ImageParagraph(byte[] image)
         {
             if (image.Take(2).SequenceEqual(jpeg) || image.Take(4).SequenceEqual(png) || image.Take(3).SequenceEqual(gif)) { }

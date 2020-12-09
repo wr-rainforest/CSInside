@@ -7,9 +7,13 @@ using System.Xml;
 
 namespace CSInside
 {
+    /// <summary>
+    /// 단락 집합을 나타냅니다.
+    /// </summary>
     public class ParagraphCollection : ICollection<Paragraph>
     {
         private List<Paragraph> paragraphs;
+
 
         public ParagraphCollection()
         {
