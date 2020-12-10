@@ -102,16 +102,21 @@ namespace CSInside
             keyValuePairs.Add("client_token", client_token);
             var contents = new MultipartFormDataContent();
             keyValuePairs.ToList().ForEach(item => contents.Add(new StringContent(item.Value), item.Key));
-            if(paragraph is StringParagraph)
+            switch (paragraph)
             {
-                contents.Add(paragraph.GetHttpContent(), "comment_memo");
-            }
-            else if(paragraph is DCConParagraph dcconpar)
-            {
-                DCCon dccon = dcconpar.DCCon;
-                var idxContent = new StringContent(dccon.DetailIndex.ToString());
-                contents.Add(paragraph.GetHttpContent(), "comment_memo");
-                contents.Add(idxContent, "detail_idx");
+                case StringParagraph strpar:
+                    contents.Add(new StringContent(strpar.Text), "comment_memo");
+                    break;
+                case DCConParagraph dcconpar:
+                    {
+                        DCCon dccon = dcconpar.DCCon;
+                        var idxContent = new StringContent(dccon.DetailIndex.ToString());
+                        contents.Add(paragraph.GetHttpContent(), "comment_memo");
+                        contents.Add(idxContent, "detail_idx");
+                        break;
+                    }
+                default:
+                    throw new CSInsideException("StringParagraph, DCConParagraph 이외의 파생 형식은 지원하지 않습니다.");
             }
             request.Content = contents;
 

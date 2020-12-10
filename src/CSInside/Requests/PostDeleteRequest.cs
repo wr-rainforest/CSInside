@@ -47,8 +47,6 @@ namespace CSInside
                 throw new CSInsideException("'Content.PostNo'의 값을 설정해주세요. ");
             if (Content.PostNo < 1)
                 throw new CSInsideException("'Content.PostNo'의 값은 1 이상이어야 합니다.");
-            if (string.IsNullOrEmpty(Content.Password))
-                throw new CSInsideException("'Content.Password'의 값을 설정해 주세요.");
 
             string galleryId = Content.GalleryId;
             int postNo = Content.PostNo;
