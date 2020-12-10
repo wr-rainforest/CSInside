@@ -8,33 +8,47 @@ namespace CSInside.XUnit
 {
     public class CommentWriteRequestTests
     {
-        static ApiService service;
-        static ApiService Service
+        static ApiService _service;
+        static ApiService service
         {
             get
             {
-                if (service == null)
+                if (_service == null)
                 {
                     AuthTokenProvider authTokenProvider = new AuthTokenProvider();
                     authTokenProvider.GetAccessToken();
                     Task.Delay(5000).Wait();
-                    service = new ApiService(authTokenProvider);
+                    _service = new ApiService(authTokenProvider);
                 }
-                return service;
+                return _service;
             }
         }
 
         [Fact]
         public async void CommentWriteRequestTest()
         {
-            CommentWriteRequest commentWriteRequest = Service.CreateCommentWriteRequest(
+            CommentWriteRequest commentWriteRequest = service.CreateCommentWriteRequest(
                 "programming",
                 1476608,
                 "ㅇㅇ",
                 "password",
                 new StringParagraph(DateTime.Now.ToString()));
-            var result = await commentWriteRequest.ExecuteAsync();
-            Assert.True(result > 0);
+            var commentNo = await commentWriteRequest.ExecuteAsync();
+            Assert.True(commentNo > 0);
+
+            try
+            {
+                var delRequest = service.CreateCommentDeleteRequest();
+                delRequest.Content.GalleryId = "programming";
+                delRequest.Content.PostNo = 1476608;
+                delRequest.Content.CommentNo = commentNo;
+                delRequest.Content.Password = "password";
+                await delRequest.ExecuteAsync();
+            }
+            catch
+            {
+
+            }
         }
 
         [Fact]
@@ -48,14 +62,27 @@ namespace CSInside.XUnit
                 PackageIndex = 63214
             };
             DCConParagraph paragraph = new DCConParagraph(dccon);
-            CommentWriteRequest commentWriteRequest = Service.CreateCommentWriteRequest(
+            CommentWriteRequest commentWriteRequest = service.CreateCommentWriteRequest(
                 "programming",
                 1476608,
                 "ㅇㅇ",
                 "password",
                 paragraph);
-            var result = await commentWriteRequest.ExecuteAsync();
-            Assert.True(result > 0);
+            var commentNo = await commentWriteRequest.ExecuteAsync();
+            Assert.True(commentNo > 0);
+            try
+            {
+                var delRequest = service.CreateCommentDeleteRequest();
+                delRequest.Content.GalleryId = "programming";
+                delRequest.Content.PostNo = 1476608;
+                delRequest.Content.CommentNo = commentNo;
+                delRequest.Content.Password = "password";
+                await delRequest.ExecuteAsync();
+            }
+            catch
+            {
+
+            }
         }
     }
 }

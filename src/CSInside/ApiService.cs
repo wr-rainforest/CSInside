@@ -199,10 +199,22 @@ namespace CSInside
         }
         #endregion
 
-        public IRequest CreateCommentDeleteRequest(string galleryId, int postNo, int commentNo, string password)
+        #region CreateCommentDeleteRequest
+        public CommentDeleteRequest CreateCommentDeleteRequest()
         {
-            throw new NotImplementedException();
+            return new CommentDeleteRequest(this);
         }
+
+        public CommentDeleteRequest CreateCommentDeleteRequest(string galleryId, int postNo, int commentNo)
+        {
+            return new CommentDeleteRequest(galleryId, postNo, commentNo, this);
+        }
+
+        public CommentDeleteRequest CreateCommentDeleteRequest(string galleryId, int postNo, int commentNo, string password)
+        {
+            return new CommentDeleteRequest(galleryId, postNo, commentNo, password, this);
+        }
+        #endregion
 
         #region IDisposable
         public void Dispose()
