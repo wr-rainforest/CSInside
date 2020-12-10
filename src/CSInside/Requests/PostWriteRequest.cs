@@ -95,10 +95,10 @@ namespace CSInside
                 string user_id = AuthTokenProvider.GetUserToken();
                 keyValuePairs.Add("user_id", user_id);
             }
-            var contents = new MultipartFormDataContent();
-            keyValuePairs.ToList().ForEach(item => contents.Add(new StringContent(item.Value), item.Key));
-            List<ImageParagraph> images = new List<ImageParagraph>();
-            List<(HttpContent, int)> dcconContents = new List<(HttpContent, int)>();
+            var multipartFormDataContent = new MultipartFormDataContent();
+            keyValuePairs.ToList().ForEach(item => multipartFormDataContent.Add(new StringContent(item.Value), item.Key));
+
+            List<ImageParagraph> imageParagraphs = new List<ImageParagraph>();
             paragraphs.ToArray()
                 .Select((v, i) => new { Value = v, Index = i })
                 .ToList()
@@ -107,41 +107,33 @@ namespace CSInside
                     HttpContent content;
                     if (item.Value is StringParagraph)
                     {
-                        content = new StringContent($"<div>{HttpUtility.HtmlEncode((string)item.Value.Content)}</div>");
+                        content = item.Value.GetHttpContent();
                     }
                     else if (item.Value is ImageParagraph imgpar)
                     {
-                        content = new StringContent($"Dc_App_Img_{images.Count}");
-                        images.Add(imgpar);
+                        content = new StringContent($"Dc_App_Img_{imageParagraphs.Count}");
+                        imageParagraphs.Add(imgpar);
                     }
                     else if (item.Value is DCConParagraph dcconpar)
                     {
-                        DCCon dccon = (DCCon)dcconpar.Content;
-                        string imgTag = 
-                            $"<img src='{dccon.ImageUri}'" +
-                            $" class='written_dccon'" +
-                            $" alt='{dccon.Title}'" +
-                            $" conalt='{dccon.Title}'" +
-                            $" title='{dccon.Title}'>";
-                        content = new StringContent(Uri.EscapeUriString(imgTag));
-                        var stringContent = new StringContent(dccon.DetailIndex.ToString());
-                        dcconContents.Add((stringContent, item.Index));
-                        contents.Add(stringContent, $"detail_idx[{item.Index}]");
+                        var stringContent = new StringContent(dcconpar.DCCon.DetailIndex.ToString());
+                        multipartFormDataContent.Add(stringContent, $"detail_idx[{item.Index}]");
+                        content = item.Value.GetHttpContent();
                     }
                     else
                     {
                         throw new CSInsideException("Paragraph 캐스팅에 실패하였습니다. CSInside.dll에 존재하지 않는 파생 클래스 형식입니다.");
                     }
-                    contents.Add(content, $"memo_block[{item.Index}]");
+                    multipartFormDataContent.Add(content, $"memo_block[{item.Index}]");
                 });
-            images.Select((v, i) => new { Value = v, Index = i })
+            imageParagraphs.Select((v, i) => new { Value = v, Index = i })
                 .ToList()
                 .ForEach(item => {
-                    var byteArrayContent = new ByteArrayContent((byte[])item.Value.Content);
+                    var byteArrayContent = item.Value.GetHttpContent();
                     byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue($"image/{item.Value.Extension.Remove(0, 1)}"); 
-                    contents.Add(byteArrayContent, $"upload[{item.Index}]", $"image_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}{item.Value.Extension}");
+                    multipartFormDataContent.Add(byteArrayContent, $"upload[{item.Index}]", $"image_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}{item.Value.Extension}");
                 });
-            request.Content = contents;
+            request.Content = multipartFormDataContent;
 
             // 전송
             var task = base.GetResponseAsync(request);

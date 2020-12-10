@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 
 namespace CSInside
@@ -10,20 +11,27 @@ namespace CSInside
     /// </summary>
     public class ImageParagraph : Paragraph
     {
-        public string Extension { get => GetImageExtension((byte[])Content); }
+        #region Property
+        public string Extension { get => GetImageExtension(image); }
 
         private byte[] image;
-
-        public override object Content
-        { 
+        public byte[] Image 
+        {
             get => image;
-            set 
+            set
             {
-                byte[] arr = (byte[])value;
+                byte[] arr = value;
                 if (!(arr.Take(2).SequenceEqual(jpeg) || arr.Take(4).SequenceEqual(png) || arr.Take(3).SequenceEqual(gif)))
                     throw new ArgumentException("이미지 파일이 아닙니다. jpeg, png, gif 파일만 인식 가능합니다.");
                 image = arr;
             }
+        }
+        #endregion
+
+        #region ctor
+        public ImageParagraph()
+        {
+
         }
 
         /// <summary>
@@ -36,6 +44,12 @@ namespace CSInside
             else
                 throw new ArgumentException("이미지 파일이 아닙니다. jpeg, png, gif 파일만 인식 가능합니다.");
             this.image = image;
+        }
+        #endregion
+
+        internal override HttpContent GetHttpContent() 
+        {
+            return new ByteArrayContent(image);
         }
 
         #region private string GetImageExtension(byte[] image)

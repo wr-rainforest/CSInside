@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 
 namespace CSInside
@@ -9,11 +10,30 @@ namespace CSInside
     /// </summary>
     public class DCConParagraph : Paragraph
     {
-        public override object Content { get; set; }
+        public DCCon DCCon { get; set; }
+
+        #region ctor
+        public DCConParagraph()
+        {
+
+        }
 
         public DCConParagraph(DCCon dccon)
         {
-            Content = dccon;
+            DCCon = dccon;
         }
+        #endregion
+
+        internal override HttpContent GetHttpContent()
+        {
+            string imgTag =
+                $"<img src='{DCCon.ImageUri}'" +
+                $" class='written_dccon'" +
+                $" alt='{DCCon.Title}'" +
+                $" conalt='{DCCon.Title}'" +
+                $" title='{DCCon.Title}'>";
+            return new StringContent(imgTag);
+        }
+
     }
 }

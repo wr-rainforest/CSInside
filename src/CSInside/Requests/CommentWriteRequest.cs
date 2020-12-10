@@ -104,20 +104,13 @@ namespace CSInside
             keyValuePairs.ToList().ForEach(item => contents.Add(new StringContent(item.Value), item.Key));
             if(paragraph is StringParagraph)
             {
-                contents.Add(new StringContent((string)paragraph.Content), "comment_memo");
+                contents.Add(paragraph.GetHttpContent(), "comment_memo");
             }
-            if(paragraph is DCConParagraph dcconpar)
+            else if(paragraph is DCConParagraph dcconpar)
             {
-                DCCon dccon = (DCCon)dcconpar.Content;
-                string imgTag =
-                    $"<img src='{dccon.ImageUri}'" +
-                    $" class='written_dccon'" +
-                    $" alt='{dccon.Title}'" +
-                    $" conalt='{dccon.Title}'" +
-                    $" title='{dccon.Title}'>";
-                var content = new StringContent(imgTag);
+                DCCon dccon = dcconpar.DCCon;
                 var idxContent = new StringContent(dccon.DetailIndex.ToString());
-                contents.Add(content, "comment_memo");
+                contents.Add(paragraph.GetHttpContent(), "comment_memo");
                 contents.Add(idxContent, "detail_idx");
             }
             request.Content = contents;

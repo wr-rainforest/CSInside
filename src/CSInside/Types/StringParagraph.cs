@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
+using System.Web;
 
 namespace CSInside
 {
@@ -9,7 +11,13 @@ namespace CSInside
     /// </summary>
     public class StringParagraph : Paragraph
     {
-        public override object Content { get; set; }
+        public string Text { get; set; }
+
+        #region ctor
+        public StringParagraph()
+        {
+
+        }
 
         /// <summary>
         /// <seealso cref="StringParagraph"/>의 새 인스턴스를 초기화합니다.
@@ -19,8 +27,13 @@ namespace CSInside
         {
             if (text == null)
                 throw new ArgumentNullException();
-            Content = text;
+            Text = text;
         }
+        #endregion
 
+        internal override HttpContent GetHttpContent()
+        {
+            return new StringContent($"<div>{HttpUtility.HtmlEncode(Text)}</div>");
+        }
     }
 }
