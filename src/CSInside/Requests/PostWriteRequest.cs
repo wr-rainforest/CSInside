@@ -98,6 +98,7 @@ namespace CSInside
             var contents = new MultipartFormDataContent();
             keyValuePairs.ToList().ForEach(item => contents.Add(new StringContent(item.Value), item.Key));
             List<ImageParagraph> images = new List<ImageParagraph>();
+            List<(HttpContent, int)> dcconContents = new List<(HttpContent, int)>();
             paragraphs.ToArray()
                 .Select((v, i) => new { Value = v, Index = i })
                 .ToList()
@@ -106,14 +107,26 @@ namespace CSInside
                     HttpContent content;
                     if (item.Value is StringParagraph)
                     {
-                        StringParagraph paragraph = (StringParagraph)item.Value;
                         content = new StringContent($"<div>{HttpUtility.HtmlEncode((string)item.Value.Content)}</div>");
                     }
-                    else if (item.Value is ImageParagraph)
+                    else if (item.Value is ImageParagraph imgpar)
                     {
-                        ImageParagraph paragraph = (ImageParagraph)item.Value;
                         content = new StringContent($"Dc_App_Img_{images.Count}");
-                        images.Add(paragraph);
+                        images.Add(imgpar);
+                    }
+                    else if (item.Value is DCConParagraph dcconpar)
+                    {
+                        DCCon dccon = (DCCon)dcconpar.Content;
+                        string imgTag = 
+                            $"<img src='{dccon.ImageUri}'" +
+                            $" class='written_dccon'" +
+                            $" alt='{dccon.Title}'" +
+                            $" conalt='{dccon.Title}'" +
+                            $" title='{dccon.Title}'>";
+                        content = new StringContent(Uri.EscapeUriString(imgTag));
+                        var stringContent = new StringContent(dccon.DetailIndex.ToString());
+                        dcconContents.Add((stringContent, item.Index));
+                        contents.Add(stringContent, $"detail_idx[{item.Index}]");
                     }
                     else
                     {
@@ -121,15 +134,13 @@ namespace CSInside
                     }
                     contents.Add(content, $"memo_block[{item.Index}]");
                 });
-            images
-                .Select((v, i) => new { Value = v, Index = i })
+            images.Select((v, i) => new { Value = v, Index = i })
                 .ToList()
                 .ForEach(item => {
                     var byteArrayContent = new ByteArrayContent((byte[])item.Value.Content);
                     byteArrayContent.Headers.ContentType = new MediaTypeHeaderValue($"image/{item.Value.Extension.Remove(0, 1)}"); 
                     contents.Add(byteArrayContent, $"upload[{item.Index}]", $"image_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}{item.Value.Extension}");
                 });
-
             request.Content = contents;
 
             // 전송
