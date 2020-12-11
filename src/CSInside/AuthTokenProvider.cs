@@ -26,7 +26,18 @@ namespace CSInside
 #nullable enable
         private string? userToken = null;
 #nullable restore
-        private DateTime dateFetchTime;
+        [JsonProperty("app_id")]
+        private string app_id { get => GetAccessToken(); set => accessToken = value; }
+
+        private DateTime appid_fetched;
+        [JsonProperty("app_id_fetched")]
+        private DateTime _appid_fetched { get { GetAccessToken(); return appid_fetched; } set => appid_fetched = value; }
+
+        [JsonProperty("client_token")]
+        private string client_token { get => GetClientToken(); set => clientToken = value; }
+
+        [JsonProperty("user_token")]
+        private string user_token { get => userToken; set => userToken = value; }
 
         #region public ctor
         public AuthTokenProvider(string accessToken = null, string clientToken = null, string userToken = null)
@@ -44,7 +55,7 @@ namespace CSInside
             this.userToken = userToken;
             if(accessToken != null)
             {
-                dateFetchTime = DateTime.Now.Date;
+                appid_fetched = DateTime.Now.Date;
             }
         }
         #endregion
@@ -52,7 +63,7 @@ namespace CSInside
         #region IAuthTokenProvider
         public string GetAccessToken()
         {
-            if (string.IsNullOrEmpty(accessToken) || DateTime.Now.Date.CompareTo(dateFetchTime) == 1)
+            if (string.IsNullOrEmpty(accessToken) || (DateTime.Now - appid_fetched).TotalSeconds >= 43200)
             {
                 accessToken = FetchAccessTokenAsync().Result;
             }
@@ -74,43 +85,30 @@ namespace CSInside
         }
         #endregion
 
-        public async Task<bool> LoginAsync(string id, string password)
+        public async Task LoginAsync(string id, string password)
         {
             // HTTP 요청
             string uri = "https://dcid.dcinside.com/join/mobile_app_login.php";
             string jsonString;
-            try
-            {
-                var request = new HttpRequestMessage(HttpMethod.Post, uri);
-                var keyValuePairs = new Dictionary<string, string>();
-                keyValuePairs.Add("user_id", id);
-                keyValuePairs.Add("user_pw", password);
-                request.Content = new FormUrlEncodedContent(keyValuePairs);
-                var response = await client.SendAsync(request);
-                //response.EnsureSuccessStatusCode();
-                jsonString = await response.Content.ReadAsStringAsync();
-            }
-            catch (Exception e)
-            {
-                if (e.GetType() == typeof(CSInsideException))
-                    throw;
-                throw new CSInsideException($"예기치 않은 예외가 발생하였습니다.", e);
-            }
-            if (string.IsNullOrEmpty(jsonString))
-            {
-                throw new CSInsideException($"예기치 않은 오류: 서버에서 빈 문자열을 반환하였습니다.");
-            }
+            var request = new HttpRequestMessage(HttpMethod.Post, uri);
+            var keyValuePairs = new Dictionary<string, string>();
+            keyValuePairs.Add("user_id", id);
+            keyValuePairs.Add("user_pw", password);
+            request.Content = new FormUrlEncodedContent(keyValuePairs);
+            var response = await client.SendAsync(request);
+            //response.EnsureSuccessStatusCode();
+            jsonString = await response.Content.ReadAsStringAsync();
 
             // 반환값 처리
             JObject jObject = JToken.Parse(jsonString) is JObject ? JToken.Parse(jsonString) as JObject : (JToken.Parse(jsonString) as JArray)[0] as JObject;
             if ((bool)jObject["result"])
             {
                 userToken = (string)jObject["user_id"];
-                return true;
+                return;
             }
             else
             {
-                return false;
+                throw new CSInsideException(jObject.ToString(Formatting.None));
             }
         }
 
@@ -123,9 +121,9 @@ namespace CSInside
             JObject dateResponseJObject = dateResponseJToken is JObject ? dateResponseJToken as JObject : (dateResponseJToken as JArray)[0] as JObject;
             if (!(bool)dateResponseJObject["result"])
             {
-                throw new Exception((string)dateResponseJObject["cause"]);
+                throw new CSInsideException(dateResponseJObject.ToString(Formatting.None));
             }
-            dateFetchTime = DateTime.Now.Date;
+            appid_fetched = DateTime.Now;
             string date = (string)dateResponseJObject["date"];
             var accessTokenRequest = new HttpRequestMessage(HttpMethod.Post, "https://dcid.dcinside.com/join/mobile_app_key_verification_3rd.php");
             var keyValuePairs = new Dictionary<string, string>();
@@ -142,7 +140,7 @@ namespace CSInside
             JObject jObject = accessTokenResponseJToken is JObject ? accessTokenResponseJToken as JObject : (accessTokenResponseJToken as JArray)[0] as JObject;
             if (!(bool)jObject["result"])
             {
-                throw new Exception((string)jObject["cause"]);
+                throw new CSInsideException(jObject.ToString(Formatting.None));
             }
             return (string)jObject["app_id"];
         }
