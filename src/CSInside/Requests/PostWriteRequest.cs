@@ -22,27 +22,54 @@ namespace CSInside
         #region ctor
         internal PostWriteRequest(ApiService service) : base(service)
         {
-            Content = new RequestContent();
+            Content = new RequestContent()
+            {
+                Paragraphs = new ParagraphCollection()
+            };
         }
 
         internal PostWriteRequest(string galleryId, string title, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, title);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                Title = title,
+                Paragraphs = new ParagraphCollection()
+            };
         }
 
         internal PostWriteRequest(string galleryId, string title, ParagraphCollection paragraphs, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, title, paragraphs);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                Title = title,
+                Paragraphs = paragraphs
+            };
         }
 
         internal PostWriteRequest(string galleryId, string title, string nickname, string password, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, title, nickname, password);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                Title = title,
+                Nickname = nickname,
+                Password = password,
+                Paragraphs = new ParagraphCollection()
+            };
         }
 
         internal PostWriteRequest(string galleryId, string title, string nickname, string password, ParagraphCollection paragraphs, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, title, nickname, password, paragraphs);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                Title = title,
+                Nickname = nickname,
+                Password = password,
+                Paragraphs = paragraphs
+            };
         }
         #endregion
 
@@ -173,44 +200,8 @@ namespace CSInside
             /// 문단 컬렉션입니다. (필수 요청 변수)
             /// </summary>
             public ParagraphCollection Paragraphs { get; set; }
-            #region ctor
-            internal RequestContent()
-            {
-                Paragraphs = new ParagraphCollection();
-            }
 
-            internal RequestContent(string galleryId, string title)
-            {
-                GalleryId = galleryId;
-                Title = title;
-                Paragraphs = new ParagraphCollection();
-            }
-
-            internal RequestContent(string galleryId, string title, ParagraphCollection paragraphs)
-            {
-                GalleryId = galleryId;
-                Title = title;
-                Paragraphs = paragraphs;
-            }
-
-            internal RequestContent(string galleryId, string title, string nickname, string password)
-            {
-                GalleryId = galleryId;
-                Title = title;
-                Nickname = nickname;
-                Password = password;
-                Paragraphs = new ParagraphCollection();
-            }
-
-            internal RequestContent(string galleryId, string title, string nickname, string password, ParagraphCollection paragraphs)
-            {
-                GalleryId = galleryId;
-                Title = title;
-                Nickname = nickname;
-                Password = password;
-                Paragraphs = paragraphs;
-            }
-            #endregion
+            internal RequestContent() { }
         }
     }
 }

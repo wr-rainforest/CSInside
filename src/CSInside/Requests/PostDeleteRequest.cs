@@ -22,14 +22,23 @@ namespace CSInside
             Content = new RequestContent();
         }
 
-        internal PostDeleteRequest(string galleryId, int postNo, string password, ApiService service) : base(service)
-        {
-            Content = new RequestContent(galleryId, postNo, password);
-        }
-
         internal PostDeleteRequest(string galleryId, int postNo, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, postNo);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                PostNo = postNo
+            };
+        }
+
+        internal PostDeleteRequest(string galleryId, int postNo, string password, ApiService service) : base(service)
+        {
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                PostNo = postNo,
+                Password = password
+            };
         }
         #endregion
 
@@ -140,19 +149,6 @@ namespace CSInside
             public string? Password { get; set; }
 #nullable restore
             internal RequestContent() { }
-
-            internal RequestContent(string galleryId, int postNo)
-            {
-                GalleryId = galleryId;
-                PostNo = postNo;
-            }
-
-            internal RequestContent(string galleryId, int postNo, string password)
-            {
-                GalleryId = galleryId;
-                PostNo = postNo;
-                Password = password;
-            }
         }
     }
 }

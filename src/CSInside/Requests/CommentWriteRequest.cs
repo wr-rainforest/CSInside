@@ -27,22 +27,44 @@ namespace CSInside
 
         internal CommentWriteRequest(string galleryId, int postNo, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, postNo);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                PostNo = postNo
+            };
         }
 
         internal CommentWriteRequest(string galleryId, int postNo, Paragraph paragraph, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, postNo, paragraph);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                PostNo = postNo,
+                Paragraph = paragraph
+            };
         }
 
         internal CommentWriteRequest(string galleryId, int postNo, string nickname, string password, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, postNo, nickname, password);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                PostNo = postNo,
+                Nickname = nickname,
+                Password = password
+            };
         }
 
         internal CommentWriteRequest(string galleryId, int postNo, string nickname, string password, Paragraph paragraph, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, postNo, nickname, password, paragraph);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                PostNo = postNo,
+                Nickname = nickname,
+                Password = password,
+                Paragraph = paragraph
+            };
         }
         #endregion
 
@@ -159,42 +181,7 @@ namespace CSInside
             /// </summary>
             public Paragraph Paragraph { get; set; }
 
-            #region ctor
-            internal RequestContent()
-            {
-                
-            }
-
-            internal RequestContent(string galleryId, int postNo)
-            {
-                GalleryId = galleryId;
-                PostNo = postNo;
-            }
-
-            internal RequestContent(string galleryId, int postNo, Paragraph paragraph)
-            {
-                GalleryId = galleryId;
-                PostNo = postNo;
-                Paragraph = paragraph;
-            }
-
-            internal RequestContent(string galleryId, int postNo, string nickname, string password)
-            {
-                GalleryId = galleryId;
-                PostNo = postNo;
-                Nickname = nickname;
-                Password = password;
-            }
-
-            internal RequestContent(string galleryId, int postNo, string nickname, string password, Paragraph paragraph)
-            {
-                GalleryId = galleryId;
-                PostNo = postNo;
-                Nickname = nickname;
-                Password = password;
-                Paragraph = paragraph;
-            }
-            #endregion
+            internal RequestContent() { }
         }
     }
 }

@@ -20,12 +20,19 @@ namespace CSInside
         #region ctor
         internal PostListRequest(ApiService service) : base(service)
         {
-            Content = new RequestContent();
+            Content = new RequestContent()
+            {
+                PageNo = 1
+            };
         }
 
         internal PostListRequest(string galleryId, int pageNo, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, pageNo);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                PageNo = pageNo
+            };
         }
         #endregion
 
@@ -79,16 +86,7 @@ namespace CSInside
             /// </summary>
             public int PageNo { get; set; }
 
-            internal RequestContent()
-            {
-                PageNo = 1;
-            }
-
-            internal RequestContent(string galleryId, int pageNo)
-            {
-                GalleryId = galleryId;
-                PageNo = pageNo;
-            }
+            internal RequestContent() { }
         }
     }
 }

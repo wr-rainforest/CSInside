@@ -23,22 +23,48 @@ namespace CSInside
         #region ctor
         internal PostSearchRequest(ApiService service) : base(service)
         {
-            Content = new RequestContent();
+            Content = new RequestContent()
+            {
+                SearchType = SearchType.All,
+                From = null,
+                PageNo = 1
+            };
         }
 
         internal PostSearchRequest(string galleryId, string keyword, SearchType searchType, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, keyword, searchType);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                Keyword = keyword,
+                SearchType = searchType,
+                From = null,
+                PageNo = 1
+            };
         }
 
         internal PostSearchRequest(string galleryId, string keyword, SearchType searchType, int from, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, keyword, searchType, from);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                Keyword = keyword,
+                SearchType = searchType,
+                From = from,
+                PageNo = 1
+            };
         }
 
         internal PostSearchRequest(string galleryId, string keyword, SearchType searchType, int from, int pageNo, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, keyword, searchType, from, pageNo);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                Keyword = keyword,
+                SearchType = searchType,
+                From = from,
+                PageNo = pageNo
+            };
         }
         #endregion
 
@@ -139,41 +165,7 @@ namespace CSInside
             /// </summary>
             public int PageNo { get; set; }
 
-            #region ctor
-            internal RequestContent() 
-            {
-                SearchType = SearchType.All;
-                From = null;
-                PageNo = 1;
-            }
-
-            internal RequestContent(string galleryId, string keyword, SearchType searchType)
-            {
-                GalleryId = galleryId;
-                Keyword = keyword;
-                SearchType = searchType;
-                From = null;
-                PageNo = 1;
-            }
-
-            internal RequestContent(string galleryId, string keyword, SearchType searchType, int from)
-            {
-                GalleryId = galleryId;
-                Keyword = keyword;
-                SearchType = searchType;
-                From = from;
-                PageNo = 1;
-            }
-
-            internal RequestContent(string galleryId, string keyword, SearchType searchType, int from, int pageNo)
-            {
-                GalleryId = galleryId;
-                Keyword = keyword;
-                SearchType = searchType;
-                From = from;
-                PageNo = pageNo;
-            }
-            #endregion
+            internal RequestContent() { }
         }
     }
 }

@@ -29,7 +29,11 @@ namespace CSInside
 
         internal PostRequest(string galleryId, int postNo, ApiService service) : base(service)
         {
-            Content = new RequestContent(galleryId, postNo);
+            Content = new RequestContent()
+            {
+                GalleryId = galleryId,
+                PostNo = postNo
+            };
         }
         #endregion
 
@@ -106,12 +110,6 @@ namespace CSInside
             public int PostNo { get; set; }
 
             internal RequestContent() { }
-
-            internal RequestContent(string galleryId, int postNo)
-            {
-                GalleryId = galleryId;
-                PostNo = postNo;
-            }
         }
     }
 }
