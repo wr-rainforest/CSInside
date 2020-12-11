@@ -10,14 +10,24 @@ namespace CSInside
     /// </summary>
     public class DCConParagraph : Paragraph
     {
+        /// <summary>
+        /// 디시콘 정보를 가져오거나 설정합니다.
+        /// </summary>
         public DCCon DCCon { get; set; }
 
         #region ctor
+        /// <summary>
+        /// <seealso cref="DCConParagraph"/> 클래스의 새 인스턴스를 초기화합니다.
+        /// </summary>
         public DCConParagraph()
         {
 
         }
 
+        /// <summary>
+        /// <paramref name="dccon"/>을 사용하여 <seealso cref="DCConParagraph"/> 클래스의 새 인스턴스를 초기화합니다.
+        /// </summary>
+        /// <param name="dccon"></param>
         public DCConParagraph(DCCon dccon)
         {
             DCCon = dccon;
