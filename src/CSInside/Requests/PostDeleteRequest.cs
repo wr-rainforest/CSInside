@@ -12,19 +12,19 @@ namespace CSInside
     public class PostDeleteRequest : RequestBase
     {
         /// <summary>
-        /// 요청 변수를 가져옵니다.
+        /// 요청 변수를 가져오거나 설정합니다.
         /// </summary>
-        public RequestContent Content { get; }
+        public Content Params { get; set; }
 
         #region ctor
         internal PostDeleteRequest(ApiService service) : base(service)
         {
-            Content = new RequestContent();
+            Params = new Content();
         }
 
         internal PostDeleteRequest(string galleryId, int postNo, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 PostNo = postNo
@@ -33,7 +33,7 @@ namespace CSInside
 
         internal PostDeleteRequest(string galleryId, int postNo, string password, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 PostNo = postNo,
@@ -50,16 +50,16 @@ namespace CSInside
         public override async Task ExecuteAsync()
         {
             // Content값 검증
-            if (string.IsNullOrEmpty(Content.GalleryId))
+            if (string.IsNullOrEmpty(Params.GalleryId))
                 throw new CSInsideException("'Content.GalleryId'의 값을 설정해 주세요.");
-            if (Content.PostNo == default)
+            if (Params.PostNo == default)
                 throw new CSInsideException("'Content.PostNo'의 값을 설정해주세요. ");
-            if (Content.PostNo < 1)
+            if (Params.PostNo < 1)
                 throw new CSInsideException("'Content.PostNo'의 값은 1 이상이어야 합니다.");
 
-            string galleryId = Content.GalleryId;
-            int postNo = Content.PostNo;
-            string password = Content.Password;
+            string galleryId = Params.GalleryId;
+            int postNo = Params.PostNo;
+            string password = Params.Password;
             if (password == null)
                 await DeleteMemberPost(galleryId, postNo);
             else
@@ -131,7 +131,7 @@ namespace CSInside
             throw new CSInsideException($"예기치 않은 오류: 응답 처리에 실패하였습니다.{jObject.ToString(Formatting.None)}");
         }
 
-        public class RequestContent
+        public class Content
         {
             /// <summary>
             /// 갤러리 ID (필수 요청 변수)
@@ -148,7 +148,7 @@ namespace CSInside
             /// </summary>
             public string? Password { get; set; }
 #nullable restore
-            internal RequestContent() { }
+            internal Content() { }
         }
     }
 }

@@ -16,19 +16,19 @@ namespace CSInside
     public class CommentDeleteRequest : RequestBase
     {
         /// <summary>
-        /// 요청 변수를 가져옵니다.
+        /// 요청 변수를 가져오거나 설정합니다.
         /// </summary>
-        public RequestContent Content { get; }
+        public Content Params { get; }
 
         #region ctor
         internal CommentDeleteRequest(ApiService service) : base(service)
         {
-            Content = new RequestContent();
+            Params = new Content();
         }
 
         internal CommentDeleteRequest(string galleryId, int postNo, int commentNo, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 PostNo = postNo,
@@ -38,7 +38,7 @@ namespace CSInside
 
         internal CommentDeleteRequest(string galleryId, int postNo, int commentNo, string password, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 PostNo = postNo,
@@ -56,28 +56,28 @@ namespace CSInside
         public override async Task ExecuteAsync()
         {
             // Content값 검증
-            if (string.IsNullOrEmpty(Content.GalleryId))
+            if (string.IsNullOrEmpty(Params.GalleryId))
                 throw new CSInsideException("'Content.GalleryId'의 값을 설정해 주세요.");
-            if (Content.PostNo == default)
+            if (Params.PostNo == default)
                 throw new CSInsideException("'Content.PostNo'의 값을 설정해주세요. ");
-            if (Content.PostNo < 1)
+            if (Params.PostNo < 1)
                 throw new CSInsideException("'Content.PostNo'의 값은 1 이상이어야 합니다.");
-            if (Content.CommentNo == default)
+            if (Params.CommentNo == default)
                 throw new CSInsideException("'Content.CommentNo'의 값을 설정해주세요. ");
-            if (Content.CommentNo < 1)
+            if (Params.CommentNo < 1)
                 throw new CSInsideException("'Content.CommentNo'의 값은 1 이상이어야 합니다.");
 
             // 초기화
-            bool isGuest = Content.Password != null;
-            string comment_pw = Content.Password;
+            bool isGuest = Params.Password != null;
+            string comment_pw = Params.Password;
             string client_token = AuthTokenProvider.GetClientToken();
-            string id = Content.GalleryId;
-            int no = Content.PostNo;
+            string id = Params.GalleryId;
+            int no = Params.PostNo;
             string board_id = "";
             string mode = "comment_del";
             string best_chk = "N";
             string best_comno = "0";
-            int comment_no = Content.CommentNo;
+            int comment_no = Params.CommentNo;
             string app_id = AuthTokenProvider.GetAccessToken();
 
             // HTTP 요청 생성
@@ -121,7 +121,7 @@ namespace CSInside
                 throw new CSInsideException((string)jObject["cause"]);
         }
 
-        public class RequestContent
+        public class Content
         {
             /// <summary>
             /// 갤러리 ID (필수 요청 변수)
@@ -143,7 +143,7 @@ namespace CSInside
             /// </summary>
             public string? Password { get; set; }
 #nullable restore
-            internal RequestContent() { }
+            internal Content() { }
         }
     }
 }

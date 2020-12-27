@@ -13,14 +13,14 @@ namespace CSInside
     public class PostListRequest : RequestBase<PostHeader[]>
     {
         /// <summary>
-        /// 요청 변수를 가져옵니다.
+        /// 요청 변수를 가져오거나 설정합니다.
         /// </summary>
-        public RequestContent Content { get; set; }
+        public Content Params { get; set; }
 
         #region ctor
         internal PostListRequest(ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 PageNo = 1
             };
@@ -28,7 +28,7 @@ namespace CSInside
 
         internal PostListRequest(string galleryId, int pageNo, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 PageNo = pageNo
@@ -44,15 +44,15 @@ namespace CSInside
         public override async Task<PostHeader[]> ExecuteAsync()
         {
             // Content 값 검증
-            if (string.IsNullOrEmpty(Content.GalleryId))
+            if (string.IsNullOrEmpty(Params.GalleryId))
                 throw new CSInsideException("");
-            if (Content.PageNo < 0)
+            if (Params.PageNo < 0)
                 throw new CSInsideException("");
 
             // 변수 초기화
             string app_id = AuthTokenProvider.GetAccessToken();
-            string galleryId = Content.GalleryId;
-            int pageNo = Content.PageNo;
+            string galleryId = Params.GalleryId;
+            int pageNo = Params.PageNo;
 
             // HTTP 요청 생성
             string hash = $"http://app.dcinside.com/api/gall_list_new.php?id={galleryId}&page={pageNo}&app_id={app_id}".ToBase64String(Encoding.UTF8);
@@ -74,7 +74,7 @@ namespace CSInside
             return jObject["gall_list"].ToObject<PostHeader[]>();
         }
 
-        public class RequestContent
+        public class Content
         {
             /// <summary>
             /// 갤러리 ID (필수 요청 변수)
@@ -86,7 +86,7 @@ namespace CSInside
             /// </summary>
             public int PageNo { get; set; }
 
-            internal RequestContent() { }
+            internal Content() { }
         }
     }
 }

@@ -16,14 +16,14 @@ namespace CSInside
 #nullable restore
     {
         /// <summary>
-        /// 요청 변수를 가져옵니다.
+        /// 요청 변수를 가져오거나 설정합니다.
         /// </summary>
-        public RequestContent Content { get; }
+        public Content Params { get; set; }
 
         #region ctor
         internal PostSearchRequest(ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 SearchType = SearchType.All,
                 From = null,
@@ -33,7 +33,7 @@ namespace CSInside
 
         internal PostSearchRequest(string galleryId, string keyword, SearchType searchType, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 Keyword = keyword,
@@ -45,7 +45,7 @@ namespace CSInside
 
         internal PostSearchRequest(string galleryId, string keyword, SearchType searchType, int from, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 Keyword = keyword,
@@ -57,7 +57,7 @@ namespace CSInside
 
         internal PostSearchRequest(string galleryId, string keyword, SearchType searchType, int from, int pageNo, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 Keyword = keyword,
@@ -78,17 +78,17 @@ namespace CSInside
 #nullable restore
         {
             // Content값 검증
-            if (string.IsNullOrEmpty(Content.GalleryId))
+            if (string.IsNullOrEmpty(Params.GalleryId))
                 throw new CSInsideException("'Content.GalleryId' 는 필수 요청 변수입니다.");
-            if (string.IsNullOrEmpty(Content.Keyword))
+            if (string.IsNullOrEmpty(Params.Keyword))
                 throw new CSInsideException("'Content.Keyword' 값이 설정되지 않았습니다");
-            if (Content.PageNo < 1)
+            if (Params.PageNo < 1)
                 throw new CSInsideException("'Content.PageNo'는 1 이상이어야 합니다.");
 
             // 변수 초기화
-            string galleryId = Content.GalleryId;
-            string keyword = Content.Keyword;
-            SearchType searchType = Content.SearchType;
+            string galleryId = Params.GalleryId;
+            string keyword = Params.Keyword;
+            SearchType searchType = Params.SearchType;
             string s_type = searchType switch
             {
                 SearchType.All => "all",
@@ -98,8 +98,8 @@ namespace CSInside
                 SearchType.TitleContent => "subject_m",
                 _ => throw new NotImplementedException("enum")
             };
-            int? _ser_pos = (Content.From == null) ? null : -Content.From - 10000;
-            int _pageNo = Content.PageNo;
+            int? _ser_pos = (Params.From == null) ? null : -Params.From - 10000;
+            int _pageNo = Params.PageNo;
 
             // HTTP 요청 생성
             string app_id = base.AuthTokenProvider.GetAccessToken();
@@ -138,7 +138,7 @@ namespace CSInside
             return result;
         }
 
-        public class RequestContent
+        public class Content
         {
             /// <summary>
             /// 갤러리ID (필수 요청 변수)
@@ -165,7 +165,7 @@ namespace CSInside
             /// </summary>
             public int PageNo { get; set; }
 
-            internal RequestContent() { }
+            internal Content() { }
         }
     }
 }

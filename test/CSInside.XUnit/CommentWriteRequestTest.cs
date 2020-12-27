@@ -39,10 +39,10 @@ namespace CSInside.XUnit
             try
             {
                 var delRequest = service.CreateCommentDeleteRequest();
-                delRequest.Content.GalleryId = "programming";
-                delRequest.Content.PostNo = 1476608;
-                delRequest.Content.CommentNo = commentNo;
-                delRequest.Content.Password = "password";
+                delRequest.Params.GalleryId = "programming";
+                delRequest.Params.PostNo = 1476608;
+                delRequest.Params.CommentNo = commentNo;
+                delRequest.Params.Password = "password";
                 await delRequest.ExecuteAsync();
             }
             catch
@@ -73,10 +73,10 @@ namespace CSInside.XUnit
             try
             {
                 var delRequest = service.CreateCommentDeleteRequest();
-                delRequest.Content.GalleryId = "programming";
-                delRequest.Content.PostNo = 1476608;
-                delRequest.Content.CommentNo = commentNo;
-                delRequest.Content.Password = "password";
+                delRequest.Params.GalleryId = "programming";
+                delRequest.Params.PostNo = 1476608;
+                delRequest.Params.CommentNo = commentNo;
+                delRequest.Params.Password = "password";
                 await delRequest.ExecuteAsync();
             }
             catch

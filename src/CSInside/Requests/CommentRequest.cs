@@ -18,19 +18,19 @@ namespace CSInside
 #nullable restore
     {
         /// <summary>
-        /// 요청 변수를 가져옵니다.
+        /// 요청 변수를 가져오거나 설정합니다.
         /// </summary>
-        public RequestContent Content { get; }
+        public Content Params { get; set; }
 
         #region ctor
         internal CommentRequest(ApiService service) : base(service)
         {
-            Content = new RequestContent();
+            Params = new Content();
         }
 
         internal CommentRequest(string galleryId, int postNo, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 PostNo = postNo
@@ -51,16 +51,16 @@ namespace CSInside
 #nullable restore
         {
             // Content값 검증
-            if (string.IsNullOrEmpty(Content.GalleryId))
+            if (string.IsNullOrEmpty(Params.GalleryId))
                 throw new CSInsideException("'Content.GalleryId'의 값을 설정해 주세요.");
-            if (Content.PostNo == default)
+            if (Params.PostNo == default)
                 throw new CSInsideException("'Content.PostNo'의 값을 설정해주세요. ");
-            if (Content.PostNo < 1)
+            if (Params.PostNo < 1)
                 throw new CSInsideException("'Content.PostNo'의 값은 1 이상이어야 합니다.");
 
             // 변수 초기화
-            string galleryId = Content.GalleryId;
-            int postNo = Content.PostNo;
+            string galleryId = Params.GalleryId;
+            int postNo = Params.PostNo;
 
             List<Comment> comments = new List<Comment>();
             for (int i = 1, pageCount = 1; i <= pageCount; i++)
@@ -97,7 +97,7 @@ namespace CSInside
             return comments.Distinct().ToArray();
         }
 
-        public class RequestContent
+        public class Content
         {
             /// <summary>
             /// 갤러리 ID (필수 요청 변수)
@@ -109,7 +109,7 @@ namespace CSInside
             /// </summary>
             public int PostNo { get; set; }
 
-            internal RequestContent() { }
+            internal Content() { }
         }
     }
 }

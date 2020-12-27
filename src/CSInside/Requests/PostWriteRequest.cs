@@ -17,12 +17,12 @@ namespace CSInside
         /// <summary>
         /// 요청 변수를 가져옵니다.
         /// </summary>
-        public RequestContent Content { get; }
+        public Content Params { get; }
 
         #region ctor
         internal PostWriteRequest(ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 Paragraphs = new ParagraphCollection()
             };
@@ -30,7 +30,7 @@ namespace CSInside
 
         internal PostWriteRequest(string galleryId, string title, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 Title = title,
@@ -40,7 +40,7 @@ namespace CSInside
 
         internal PostWriteRequest(string galleryId, string title, ParagraphCollection paragraphs, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 Title = title,
@@ -50,7 +50,7 @@ namespace CSInside
 
         internal PostWriteRequest(string galleryId, string title, string nickname, string password, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 Title = title,
@@ -62,7 +62,7 @@ namespace CSInside
 
         internal PostWriteRequest(string galleryId, string title, string nickname, string password, ParagraphCollection paragraphs, ApiService service) : base(service)
         {
-            Content = new RequestContent()
+            Params = new Content()
             {
                 GalleryId = galleryId,
                 Title = title,
@@ -81,25 +81,25 @@ namespace CSInside
         public override async Task<int> ExecuteAsync()
         {
             // Content값 검증
-            if (string.IsNullOrEmpty(Content.GalleryId))
+            if (string.IsNullOrEmpty(Params.GalleryId))
                 throw new CSInsideException("'Content.GalleryId'의 값을 설정해 주세요.");
-            if (string.IsNullOrEmpty(Content.Title))
+            if (string.IsNullOrEmpty(Params.Title))
                 throw new CSInsideException("'Content.Title'의 값을 설정해 주세요.");
-            if (Content.Paragraphs.Count == 0)
+            if (Params.Paragraphs.Count == 0)
                 throw new CSInsideException("'Content.Paragraphs' == 0");
-            bool isAnonymous = !string.IsNullOrEmpty(Content.Nickname) && !string.IsNullOrEmpty(Content.Password);
+            bool isAnonymous = !string.IsNullOrEmpty(Params.Nickname) && !string.IsNullOrEmpty(Params.Password);
 
             // 변수 초기화
-            string galleryId = Content.GalleryId;
-            string title = Content.Title;
+            string galleryId = Params.GalleryId;
+            string title = Params.Title;
             string nickname = null;
             string password = null;
             if (isAnonymous)
             {
-                nickname = Content.Nickname;
-                password = Content.Password;
+                nickname = Params.Nickname;
+                password = Params.Password;
             }
-            ParagraphCollection paragraphs = Content.Paragraphs;
+            ParagraphCollection paragraphs = Params.Paragraphs;
 
             // HTTP 요청 생성
             string appId = base.AuthTokenProvider.GetAccessToken();
@@ -174,7 +174,7 @@ namespace CSInside
                 throw new CSInsideException((string)jObject["cause"]);
         }
 
-        public class RequestContent
+        public class Content
         {
             /// <summary>
             /// 갤러리 ID (필수 요청 변수)
@@ -201,7 +201,7 @@ namespace CSInside
             /// </summary>
             public ParagraphCollection Paragraphs { get; set; }
 
-            internal RequestContent() { }
+            internal Content() { }
         }
     }
 }
