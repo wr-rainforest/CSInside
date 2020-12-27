@@ -35,14 +35,6 @@ namespace CSInside.XUnit
         }
 
         [Fact]
-        public async void PostRequestWithInvalidAuthTokenTest()
-        {
-            PostRequest request = new ApiService(new AuthTokenProvider("InvalidToken")).CreatePostRequest("programming", 1540253);
-            var exception = await Assert.ThrowsAsync<CSInsideException>(async () => { await request.ExecuteAsync(); });
-            Assert.Contains("올바르지 않은 인증 토큰", exception.Message);
-        }
-
-        [Fact]
         public async void AdultGalleryPostRequestTest()
         {
             PostRequest request = Service.CreatePostRequest("nude", 1540253);

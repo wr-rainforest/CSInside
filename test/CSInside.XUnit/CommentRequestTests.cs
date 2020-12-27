@@ -45,14 +45,6 @@ namespace CSInside.XUnit
             CommentRequest request = Service.CreateCommentRequest("programming", 1540253);
             Assert.Null(await request.ExecuteAsync());
         }
-
-        [Fact]
-        public async void CommentRequestWithInvalidAuthTokenTest()
-        {
-            CommentRequest request = new ApiService(new AuthTokenProvider("InvalidToken")).CreateCommentRequest("programming", 1540253);
-            var exception = await Assert.ThrowsAsync<CSInsideException>(async () => { await request.ExecuteAsync(); });
-            Assert.Contains("올바르지 않은 인증 토큰", exception.Message);
-        }
 #nullable restore
     }
 }
